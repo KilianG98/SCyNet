@@ -35,7 +35,7 @@ public class CyActivator extends AbstractCyActivator {
 
 		Properties createNetworkViewTaskFactoryProps = new Properties();
 		createNetworkViewTaskFactoryProps.setProperty("preferredMenu","Apps.Samples");
-		createNetworkViewTaskFactoryProps.setProperty("title","Create Network View");
+		createNetworkViewTaskFactoryProps.setProperty("title","Software Project");
 		registerService(bc,createNetworkViewTaskFactory,TaskFactory.class, createNetworkViewTaskFactoryProps);
 	}
 }

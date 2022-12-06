@@ -7,9 +7,15 @@ import org.cytoscape.session.CyNetworkNaming;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.TaskMonitor;
+
+import javax.swing.plaf.ColorUIResource;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 
 public class CreateNetworkViewTask extends AbstractTask {
@@ -33,42 +39,6 @@ public class CreateNetworkViewTask extends AbstractTask {
 		this.dataSourceManager = dataSourceManager;
 	}
 
-	public boolean check_external(String compartment) {
-		if(compartment.length() > 2) {
-			return compartment.charAt(2) == 'e';
-		}
-		return false;
-	}
-
-	public void from_old_to_new(CyNode old_node, CyNetwork old_network, CyNetwork new_network) {
-		CyNode new_node = new_network.addNode();
-		String name = old_network.getDefaultNodeTable().getRow(old_node.getSUID()).get("name", String.class);
-		new_network.getDefaultNodeTable().getRow(new_node.getSUID()).set("name", name);
-		// System.out.println(name);
-	}
-
-	public HashMap<CyNode, List<CyNode>> node_suid_edge_map(CyNetwork old_network) {
-		HashMap<CyNode, List<CyNode>> edge_map = new HashMap<CyNode, List<CyNode>>();
-		List<CyEdge> old_edge_list = old_network.getEdgeList();
-
-		for (CyEdge current_edge : old_edge_list) {	// THIS IS TO FIND THE and/or FROM ON SIDE
-			CyNode first_node = current_edge.getSource();
-			CyNode key_node = current_edge.getTarget();
-			List<CyNode> value_node_list = new ArrayList<CyNode>();
-
-			for (CyEdge next_edge : old_edge_list) { // AND FROM THE OTHER SIDE
-				CyNode second_node = next_edge.getTarget();
-				if (Objects.equals(first_node, second_node)) {
-					//MAKE CONNECTION!
-					value_node_list.add(next_edge.getSource());
-				}
-
-			edge_map.put(key_node, value_node_list);
-			}
-		}
-		return edge_map;
-	}
-
 	public void run(TaskMonitor monitor) {
 		// I look at existing networks before creating my own network
 		Set<CyNetwork> set_of_networks = networkManager.getNetworkSet();
@@ -87,7 +57,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 			EdgeStuff edgeStuff = new EdgeStuff(original_network, newNetwork, nodeStuff);
 
 			// Here I add a name to my Network
-			newNetwork.getDefaultNetworkTable().getRow(newNetwork.getSUID()).set("name", cyNetworkNaming.getSuggestedNetworkTitle("Newly created Network-view"));
+			newNetwork.getDefaultNetworkTable().getRow(newNetwork.getSUID()).set("name", cyNetworkNaming.getSuggestedNetworkTitle("Simplified Network-view"));
 			this.networkManager.addNetwork(newNetwork);
 
 			final Collection<CyNetworkView> views = networkViewManager.getNetworkViews(newNetwork);
@@ -102,6 +72,18 @@ public class CreateNetworkViewTask extends AbstractTask {
 			} else {
 				System.out.println("networkView already existed.");
 			}
+			// Here I change the color/size etc. of the Nodes
+			List<String> compList = nodeStuff.getIntComps();
+
+			for (String compartment: compList) {
+				View<CyNode> nodeView = myView.getNodeView(nodeStuff.getCompNodeFromName(compartment));
+				double nodeSize = nodeView.getVisualProperty(BasicVisualLexicon.NODE_SIZE) + 100;
+				Paint nodeColor = new ColorUIResource(Color.blue);
+				//nodeView.setVisualProperty(BasicVisualLexicon.NODE_BORDER_WIDTH, lineWidth);
+				nodeView.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, nodeColor);
+				nodeView.setLockedValue(BasicVisualLexicon.NODE_SIZE, nodeSize);
+			}
+
 			// Set the variable destroyView to true, the following snippet of code
 			// will destroy a view
 			boolean destroyView = false;

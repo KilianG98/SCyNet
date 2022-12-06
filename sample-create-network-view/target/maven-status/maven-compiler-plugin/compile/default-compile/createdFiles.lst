@@ -1,5 +1,5 @@
-org/cytoscape/sample/internal/CyActivator.class
-org/cytoscape/sample/internal/NodeStuff.class
-org/cytoscape/sample/internal/EdgeStuff.class
-org/cytoscape/sample/internal/CreateNetworkViewTaskFactory.class
-org/cytoscape/sample/internal/CreateNetworkViewTask.class
+org\cytoscape\sample\internal\EdgeStuff.class
+org\cytoscape\sample\internal\NodeStuff.class
+org\cytoscape\sample\internal\CyActivator.class
+org\cytoscape\sample\internal\CreateNetworkViewTask.class
+org\cytoscape\sample\internal\CreateNetworkViewTaskFactory.class
