@@ -44,6 +44,7 @@ public class EdgeStuff {
         newNetwork.getDefaultEdgeTable().createColumn("source", String.class, true);
         newNetwork.getDefaultEdgeTable().createColumn("target", String.class, true);
         newNetwork.getDefaultEdgeTable().createColumn("edgeID", String.class, true);
+        newNetwork.getDefaultEdgeTable().createColumn("stoichiometry", Double.class, true);
         makeEdgesToNode(externalNodes);
         makeEdgesFromNode(externalNodes);
     }
@@ -51,18 +52,25 @@ public class EdgeStuff {
         int counterID = 0;
         for (CyNode oldExternalNode : oldExtNodes) {
             CyNode newExternalNode = nodeStuff.getNewNode(oldExternalNode);
-            List<CyNode> oldSources = getSourcesOld(oldExternalNode);
-            List<CyNode> similarNodes = nodeStuff.getExtNodesFromName(nodeStuff.getNodeSharedName(oldExternalNode));
+            List<CyNode> oldSources = new ArrayList<>();
+            HashMap<CyNode, CyEdge> sourceMap = new HashMap<>();
 
+            List<CyEdge> oldEdges = getSourcesOld(oldExternalNode);
+            List<CyNode> similarNodes = nodeStuff.getExtNodesFromName(nodeStuff.getNodeSharedName(oldExternalNode));
             for (CyNode similarNode : similarNodes) {
-                oldSources.addAll(getSourcesOld(similarNode));
+                oldEdges.addAll(getSourcesOld(similarNode));
             }
+            for (CyEdge oldEdge : oldEdges) {
+                sourceMap.put(oldEdge.getSource(), oldEdge);
+                oldSources.add(oldEdge.getSource());
+            }
+
+
             for (CyNode oldSource : oldSources) {
+                Double stoich = oldNetwork.getDefaultEdgeTable().getRow(sourceMap.get(oldSource).getSUID()).get("stoichiometry", Double.class);
                 //String temp = Integer.toString(counterID).concat("-");
                 if (externalNodes.contains(oldSource)) {//this never happens in our network
                     String edgeID = Long.toString(oldSource.getSUID()).concat("_".concat(Long.toString(oldExternalNode.getSUID())));
-                    String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("name", String.class);
-                    String targetName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
 
                     if (!edgeIDs.contains(edgeID)) {
                         edgeIDs.add(edgeID);
@@ -73,6 +81,12 @@ public class EdgeStuff {
                         String edgeName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("name", String.class).concat(temp.concat(oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class)));
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("shared name", edgeName);
 
+                        String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("name", String.class);
+                        String targetName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
+
+                        if (stoich != null) {
+                            newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("stoichiometry", stoich);
+                        }
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("source", sourceName);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("target", targetName);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("edgeID", edgeID);
@@ -95,8 +109,6 @@ public class EdgeStuff {
                     }
                     //create edgename as concat of node names
                     String edgeID = Long.toString(compartmentNode.getSUID()).concat("_".concat(Long.toString(oldExternalNode.getSUID())));
-                    String sourceName = nodeStuff.getCompNameFromNode(compartmentNode);
-                    String targetName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
                     //add the edge, only if it does not already exist in our new network
                     if (!edgeIDs.contains(edgeID)) {
                         edgeIDs.add(edgeID);
@@ -107,6 +119,12 @@ public class EdgeStuff {
                         String edgeName = exp.concat(temp.concat(oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class)));
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("shared name", edgeName);
 
+                        String sourceName = nodeStuff.getCompNameFromNode(compartmentNode);
+                        String targetName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
+
+                        if (stoich != null) {
+                            newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("stoichiometry", stoich);
+                        }
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("source", sourceName);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("target", targetName);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("edgeID", edgeID);
@@ -118,19 +136,25 @@ public class EdgeStuff {
     private void makeEdgesFromNode(List<CyNode> oldExternalNodes) {
         int counterID = 0;
         for (CyNode oldExternalNode:oldExternalNodes) {
-
             CyNode newExternalNode = nodeStuff.getNewNode(oldExternalNode);
-            List<CyNode> oldTargets = getTargetsOld(oldExternalNode);
-            List<CyNode> similarNodes = nodeStuff.getExtNodesFromName(nodeStuff.getNodeSharedName(oldExternalNode));
+            List<CyNode> oldTargets = new ArrayList<>();
+            HashMap<CyNode, CyEdge> targetMap = new HashMap<>();
 
+            List<CyEdge> oldEdges = getTargetsOld(oldExternalNode);
+            List<CyNode> similarNodes = nodeStuff.getExtNodesFromName(nodeStuff.getNodeSharedName(oldExternalNode));
             for (CyNode similarNode : similarNodes) {
-                oldTargets.addAll(getTargetsOld(similarNode));
+                oldEdges.addAll(getTargetsOld(similarNode));
             }
+            for (CyEdge oldEdge : oldEdges) {
+                targetMap.put(oldEdge.getTarget(), oldEdge);
+                oldTargets.add(oldEdge.getTarget());
+            }
+
+
             for (CyNode oldTarget : oldTargets) {
+                Double stoich = oldNetwork.getDefaultEdgeTable().getRow(targetMap.get(oldTarget).getSUID()).get("stoichiometry", Double.class);
                 if (externalNodes.contains(oldTarget)) {//this happens
                     String edgeID = Long.toString(oldExternalNode.getSUID()).concat("_".concat(Long.toString(oldTarget.getSUID())));
-                    String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
-                    String targetName = oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("name", String.class);
 
                     if (!edgeIDs.contains(edgeID)) {
                         edgeIDs.add(edgeID);
@@ -141,6 +165,12 @@ public class EdgeStuff {
                         String edgeName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class).concat(temp.concat(oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("name", String.class)));
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("shared name", edgeName);
 
+                        String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
+                        String targetName = oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("name", String.class);
+
+                        if (stoich != null) {
+                            newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("stoichiometry", stoich);
+                        }
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("edgeID", edgeID);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("source", sourceName);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("target", targetName);
@@ -162,10 +192,8 @@ public class EdgeStuff {
                         continue;
                     }
                     String edgeID = Long.toString(oldExternalNode.getSUID()).concat("_".concat(Long.toString(compartmentNode.getSUID())));
-                    String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
-                    String targetName = nodeStuff.getCompNameFromNode(compartmentNode);
 
-                    //add the edge only if its not already part of the new network
+                    //add the edge only if it is not already part of the new network
                     if (!edgeIDs.contains(edgeID)) {
                         edgeIDs.add(edgeID);
                         CyEdge newEdge = newNetwork.addEdge(newExternalNode, compartmentNode, true);
@@ -175,6 +203,12 @@ public class EdgeStuff {
                         String edgeName = imp.concat(temp.concat(oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class)));
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("shared name", edgeName);
 
+                        String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldExternalNode.getSUID()).get("name", String.class);
+                        String targetName = nodeStuff.getCompNameFromNode(compartmentNode);
+
+                        if (stoich != null) {
+                            newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("stoichiometry", stoich);
+                        }
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("edgeID", edgeID);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("source", sourceName);
                         newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("target", targetName);
@@ -186,21 +220,13 @@ public class EdgeStuff {
             }
         }
     }
-    private List<CyNode> getTargetsOld(CyNode cyNode) {
-        List<CyNode> adjacencyList = new ArrayList<>();
+    private List<CyEdge> getTargetsOld(CyNode cyNode) {
         List<CyEdge> edgeTargets = outgoingEdges.get(cyNode);
-        for (CyEdge edgeTarget : edgeTargets) {
-            adjacencyList.add(edgeTarget.getTarget());
-        }
-        return adjacencyList;
+        return new ArrayList<>(edgeTargets);
     }
-    private List<CyNode> getSourcesOld(CyNode cyNode) {
-        List<CyNode> adjacencyList = new ArrayList<>();
+    private List<CyEdge> getSourcesOld(CyNode cyNode) {
         List<CyEdge> edgeSources = incomingEdges.get(cyNode);
-        for (CyEdge edgeSource : edgeSources) {
-            adjacencyList.add(edgeSource.getSource());
-        }
-        return adjacencyList;
+        return new ArrayList<>(edgeSources);
     }
 }
 

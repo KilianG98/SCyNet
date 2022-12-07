@@ -5,6 +5,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NodeStuff {
 
@@ -33,15 +34,19 @@ public class NodeStuff {
     private List<String> createComps() {
         // This are all compartments (external + internal) and the exchange compartment
         List<String> compartments = new ArrayList<String>();
-            CyColumn compartmentColumn = oldNetwork.getDefaultNodeTable().getColumn("sbml compartment");
+        CyColumn compartmentColumn = oldNetwork.getDefaultNodeTable().getColumn("sbml compartment");
         List<String> compartmentsCol = compartmentColumn.getValues(String.class);
 
         for (String compartment : compartmentsCol) {
-            if (compartment.length() > 1) {
-                if (compartments.contains(compartment)) {
-                    continue;
+            if (compartment == null) {
+                continue;
+            } else {
+                if (compartment.length() > 1) {
+                    if (compartments.contains(compartment)) {
+                        continue;
+                    }
+                    compartments.add(compartment);
                 }
-                compartments.add(compartment);
             }
         }
         return compartments;
@@ -120,7 +125,7 @@ public class NodeStuff {
     private String getCompIfMetaboliteNode(CyNode node) {
         String name = oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class);
 
-        if (Objects.equals(name, "")) {
+        if (name == null) {
             return "unknown";
         }
         String comp = name.substring(name.lastIndexOf('_') + 1);
