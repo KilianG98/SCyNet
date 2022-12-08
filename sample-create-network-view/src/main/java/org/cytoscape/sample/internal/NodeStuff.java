@@ -5,7 +5,6 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class NodeStuff {
 
@@ -15,10 +14,10 @@ public class NodeStuff {
     private HashMap<CyNode, CyNode> newToOldNodes;
     private HashMap<String, CyNode> compNameToCompNode;
     private HashMap<CyNode, String> compNodeToCompName;
-    private HashMap<String, List<CyNode>> extNamesToNodes;
+    private HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
     final private List<String> allCompartments;
     final private List<String> internalCompartments;
-    private List<CyNode> extNodes;
+    private List<CyNode> extNodes = new ArrayList<>();
     // Constructor
     public NodeStuff(CyNetwork oldNetwork, CyNetwork newNetwork) {
         this.oldNetwork = oldNetwork;
@@ -32,15 +31,13 @@ public class NodeStuff {
 
     // Private Methods
     private List<String> createComps() {
-        // This are all compartments (external + internal) and the exchange compartment
-        List<String> compartments = new ArrayList<String>();
+        // These are all compartments (external + internal) and the exchange compartment
+        List<String> compartments = new ArrayList<>();
         CyColumn compartmentColumn = oldNetwork.getDefaultNodeTable().getColumn("sbml compartment");
         List<String> compartmentsCol = compartmentColumn.getValues(String.class);
 
         for (String compartment : compartmentsCol) {
-            if (compartment == null) {
-                continue;
-            } else {
+            if (compartment != null){
                 if (compartment.length() > 1) {
                     if (compartments.contains(compartment)) {
                         continue;
@@ -63,32 +60,29 @@ public class NodeStuff {
         return intCompNodeNames;
     }
 
-    // THIS METHOD COULD BE WRITTEN MORE UNDERSTANDABLE!
     private void createExtNodes() {
-        List<CyNode> externalNodes = new ArrayList<CyNode>();
-        Set<String> externalNodeNames = new HashSet<String>();
-        HashMap<String, List<CyNode>> externalNamesToNodes = new HashMap<>();
         List<CyNode> allNodes = oldNetwork.getNodeList();
-        //create List of exchg and external Nodes
+        List<String> externalNodeNames = new ArrayList<>();
+
         for (CyNode currentNode : allNodes) {
-            String currentComp = getCompIfMetaboliteNode(currentNode);
+            String currentComp = getCompOfMetaboliteNode(currentNode);
+
             if (currentComp.charAt(2) == 'e') {
                 String currentName = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("shared name", String.class);
+
                 if (!externalNodeNames.contains(currentName)) {
-                    externalNodes.add(currentNode);
+                    extNodes.add(currentNode);
                     externalNodeNames.add(currentName);
                     //creating a list of the Nodes which have the same name
                     List<CyNode> externalNodeList = new ArrayList<>();
                     externalNodeList.add(currentNode);
-                    externalNamesToNodes.put(currentName, externalNodeList);
+                    extNamesToNodes.put(currentName, externalNodeList);
                 } else {
                     //adding nodes to the same name list
-                    externalNamesToNodes.get(currentName).add(currentNode);
+                    extNamesToNodes.get(currentName).add(currentNode);
                 }
             }
         }
-        this.extNodes = externalNodes;
-        this.extNamesToNodes = externalNamesToNodes;
     }
 
     private void addExtNodesToNewNetwork(List<CyNode> externalNodes, CyNetwork newNetwork) {
@@ -122,14 +116,15 @@ public class NodeStuff {
         this.compNodeToCompName = compNodeTranslation;
     }
 
-    private String getCompIfMetaboliteNode(CyNode node) {
+    private String getCompOfMetaboliteNode(CyNode node) {
         String name = oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class);
 
         if (name == null) {
             return "unknown";
         }
-        String comp = name.substring(name.lastIndexOf('_') + 1);
+        if (name.length() == 0){return "unknown";}
         if (name.charAt(0) == 'M'){
+            String comp = name.substring(name.lastIndexOf('_') + 1);
             if (allCompartments.contains(comp)) {
                 return comp;
             }
