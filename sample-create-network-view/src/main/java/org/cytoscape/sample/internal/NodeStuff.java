@@ -14,10 +14,10 @@ public class NodeStuff {
     private HashMap<CyNode, CyNode> newToOldNodes;
     private HashMap<String, CyNode> compNameToCompNode;
     private HashMap<CyNode, String> compNodeToCompName;
-    private HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
+    private final HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
     final private List<String> allCompartments;
     final private List<String> internalCompartments;
-    private List<CyNode> extNodes = new ArrayList<>();
+    private final List<CyNode> extNodes = new ArrayList<>();
     // Constructor
     public NodeStuff(CyNetwork oldNetwork, CyNetwork newNetwork) {
         this.oldNetwork = oldNetwork;
