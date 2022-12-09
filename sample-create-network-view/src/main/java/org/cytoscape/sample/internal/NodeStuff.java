@@ -197,6 +197,14 @@ public class NodeStuff {
     public String getNodeCyID(CyNode node) {
         return oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("CyID", String.class);
     }
+    public CyNode getIntCompNodeForAnyNode(CyNode node){
+
+        String compartment = getCompOfNode(node);
+        if (compartment.charAt(2) == 'e'){
+            compartment = getNodeSharedName(getIntCompNodeFromExtNode(node));
+        }
+        return getCompNodeFromName(compartment);
+    }
 
     public List<String> getAllComps() {
         return allCompartments;
