@@ -33,16 +33,16 @@ public class NodeStuff {
     private List<String> createComps() {
         // These are all compartments (external + internal) and the exchange compartment
         List<String> compartments = new ArrayList<>();
-        CyColumn compartmentColumn = oldNetwork.getDefaultNodeTable().getColumn("sbml compartment");
-        List<String> compartmentsCol = compartmentColumn.getValues(String.class);
-
-        for (String compartment : compartmentsCol) {
-            if (compartment != null){
-                if (compartment.length() > 1) {
-                    if (compartments.contains(compartment)) {
+        List<CyNode> allNodes = oldNetwork.getNodeList();
+        for (CyNode currentNode : allNodes) {
+            if (oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml compartment", String.class) != null) {
+                String newName = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml compartment", String.class);
+                if (newName.length() > 1) {
+                    if (compartments.contains(newName)) {
                         continue;
+                    } else {
+                        compartments.add(newName);
                     }
-                    compartments.add(compartment);
                 }
             }
         }
