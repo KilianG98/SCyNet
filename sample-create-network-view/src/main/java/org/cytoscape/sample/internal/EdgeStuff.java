@@ -52,14 +52,12 @@ public class EdgeStuff {
             for (CyNode oSource : oldSources) {
                 String edgeID;
                 if (oldExternalNodes.contains(oSource)) {
-                    edgeID = oSource.getSUID().toString().concat("-".concat(oldExtNode.getSUID().toString()));
-                    if (!edgeIDs.contains(edgeID)) {
-                        edgeIDs.add(edgeID);
-                        makeEdge(nodeStuff.getNewNode(oSource), nodeStuff.getNewNode(oldExtNode));
-                    }
-                } else {
+                    makeEdge(nodeStuff.getNewNode(oSource), nodeStuff.getNewNode(oldExtNode));
+                    } else {
                     CyNode comp = nodeStuff.getIntCompNodeForAnyNode(oSource);
+                    makeEdge(comp,nodeStuff.getNewNode(oldExtNode));
                 }
+
             }
         }
     }
@@ -189,8 +187,11 @@ public class EdgeStuff {
             return new ArrayList<>(edgeSources);
         }
         private void makeEdge (CyNode source, CyNode target){
-
-            CyEdge newEdge = newNetwork.addEdge(source, target, true);
+            String edgeID = source.getSUID().toString().concat("-".concat(target.getSUID().toString()));
+            if(!edgeIDs.contains(edgeID)) {
+                edgeIDs.add(edgeID);
+                CyEdge newEdge = newNetwork.addEdge(source, target, true);
+            }
 
         }
     }

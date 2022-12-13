@@ -46,6 +46,7 @@ public class NodeStuff {
                 }
             }
         }
+        System.out.println(compartments);
         return compartments;
     }
 
@@ -174,13 +175,25 @@ public class NodeStuff {
 
     public String getCompOfNode(CyNode node) {
 
-        String name = oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class);
-
-        if (Objects.equals(name, "")) {
+        String comp = oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class);
+        System.out.println("testtesttest");
+        System.out.println(comp);
+        if (Objects.equals(comp, "")) {
             return "unknown";
         }
-        String comp = name.substring(name.lastIndexOf('_') + 1);
+        if(comp == null){
+            System.out.println("yay");
+            return "unknown";
+        }
+        if (comp.contains("_")) {
+
+            System.out.println(comp.lastIndexOf("_"));
+            comp = comp.substring(comp.lastIndexOf('_') + 1).toString();
+            System.out.println(comp);
+        }
         if (allCompartments.contains(comp)) {
+            System.out.println("ist enthalten");
+            System.out.println(comp);
             return comp;
         }
         return "unknown";
@@ -200,9 +213,23 @@ public class NodeStuff {
     public CyNode getIntCompNodeForAnyNode(CyNode node){
 
         String compartment = getCompOfNode(node);
-        if (compartment.charAt(2) == 'e'){
-            compartment = getNodeSharedName(getIntCompNodeFromExtNode(node));
+
+        System.out.println(compartment);
+        if (compartment == "unknown"){
+            compartment = getNodeCyID(node);
+            if (compartment.contains("_")){
+                System.out.println(compartment);
+                compartment=compartment.substring(compartment.lastIndexOf("_")+1);
+                System.out.println(compartment);
+            }else{
+                System.out.println("critical error!!");
+                return getCompNodeFromName("erc0");
+            }
         }
+        if (compartment.charAt(2) == 'e'){
+            compartment = getIntCompNameFromExtCompName(compartment);
+        }
+        System.out.println(compartment);
         return getCompNodeFromName(compartment);
     }
 
@@ -213,5 +240,12 @@ public class NodeStuff {
     public List<String> getIntComps(){
         return internalCompartments;
     }
-
+    public String getIntCompNameFromExtCompName(String extComp){
+        for(String intComp: internalCompartments){
+            if (intComp.substring(0,2).equals(extComp.substring(0,2))){
+                return intComp;
+            }
+        }
+        return"unknown";
+    }
 }
