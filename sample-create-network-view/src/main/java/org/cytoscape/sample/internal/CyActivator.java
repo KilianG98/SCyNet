@@ -1,6 +1,7 @@
 package org.cytoscape.sample.internal;
 
 import org.cytoscape.io.datasource.DataSourceManager;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -11,6 +12,7 @@ import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.session.CyNetworkNaming;
 
 import java.util.Properties;
+import java.util.Set;
 
 
 public class CyActivator extends AbstractCyActivator {
@@ -31,11 +33,17 @@ public class CyActivator extends AbstractCyActivator {
 		CyNetworkViewFactory cyNetworkViewFactoryServiceRef = getService(bc,CyNetworkViewFactory.class);
 		CyNetworkViewManager cyNetworkViewManagerServiceRef = getService(bc,CyNetworkViewManager.class);
 
-		CreateNetworkViewTaskFactory createNetworkViewTaskFactory = new CreateNetworkViewTaskFactory(cyNetworkNamingServiceRef, cyNetworkFactoryServiceRef,cyNetworkManagerServiceRef, cyNetworkViewFactoryServiceRef, cyNetworkViewManagerServiceRef, dataSourceManager);
 
 		Properties createNetworkViewTaskFactoryProps = new Properties();
 		createNetworkViewTaskFactoryProps.setProperty("preferredMenu","Apps.Samples");
-		createNetworkViewTaskFactoryProps.setProperty("title","Software Project");
-		registerService(bc,createNetworkViewTaskFactory,TaskFactory.class, createNetworkViewTaskFactoryProps);
+
+		// This Part has been changed to make the Menu bigger and add the currently loaded Networks
+		Set<CyNetwork> allNetworks = cyNetworkManagerServiceRef.getNetworkSet();
+		for (CyNetwork currentNetwork : allNetworks) {
+			CreateNetworkViewTaskFactory createNetworkViewTaskFactory = new CreateNetworkViewTaskFactory(cyNetworkNamingServiceRef, cyNetworkFactoryServiceRef,cyNetworkManagerServiceRef, cyNetworkViewFactoryServiceRef, cyNetworkViewManagerServiceRef, dataSourceManager, currentNetwork);
+			String currentName = currentNetwork.getDefaultNetworkTable().getRow(currentNetwork.getSUID()).get("name", String.class);
+			createNetworkViewTaskFactoryProps.setProperty("title", currentName);
+			registerService(bc,createNetworkViewTaskFactory,TaskFactory.class, createNetworkViewTaskFactoryProps);
+		}
 	}
 }

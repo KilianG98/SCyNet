@@ -1,6 +1,7 @@
 package org.cytoscape.sample.internal;
 
 import org.cytoscape.io.datasource.DataSourceManager;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.session.CyNetworkNaming;
@@ -17,9 +18,10 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 	private final CyNetworkManager networkManager;
 	private final CyNetworkNaming cyNetworkNaming;
 	private final DataSourceManager dataSourceManager;
+	private final CyNetwork currentNetwork;
 
 	public CreateNetworkViewTaskFactory(CyNetworkNaming cyNetworkNaming, CyNetworkFactory cnf, CyNetworkManager networkManager, CyNetworkViewFactory cnvf,
-										final CyNetworkViewManager networkViewManager, DataSourceManager dataSourceManager){
+										final CyNetworkViewManager networkViewManager, DataSourceManager dataSourceManager, CyNetwork currentNetwork){
 
 		this.cnf = cnf;
 		this.cnvf = cnvf;
@@ -27,10 +29,10 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 		this.networkManager = networkManager;
 		this.cyNetworkNaming = cyNetworkNaming;
 		this.dataSourceManager = dataSourceManager;
-
+		this.currentNetwork = currentNetwork;
 	}
 
 	public TaskIterator createTaskIterator(){
-		return new TaskIterator(new CreateNetworkViewTask(cyNetworkNaming, cnf,networkManager, cnvf, networkViewManager, dataSourceManager));
+		return new TaskIterator(new CreateNetworkViewTask(cyNetworkNaming, cnf,networkManager, cnvf, networkViewManager, dataSourceManager, currentNetwork));
 	}
 }
