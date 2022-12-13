@@ -103,13 +103,14 @@ public class EdgeStuff {
         int counterID = 0;
         // This I will need WHEN I SEPARATE THE METHODS
         HashMap<CyNode, HashMap<CyNode, List<CyEdge>>> fullTargetNodeToEdgeMap = new HashMap<>();
-        for (CyNode oldExternalNode : oldExtNodes) {
-            CyNode newExternalNode = nodeStuff.getNewNode(oldExternalNode);
+        for (CyNode oldExtNode : oldExtNodes) {
+            CyNode newExternalNode = nodeStuff.getNewNode(oldExtNode);
             // List<CyNode> oldTargets = new ArrayList<>();     MAYBE NOT NEEDED (are keys of HashMap)
             HashMap<CyNode, List<CyEdge>> targetNodeToEdgeMap = new HashMap<>();
 
-            List<CyEdge> oldEdges = getTargetsOld(oldExternalNode);
-            List<CyNode> similarNodes = nodeStuff.getExtNodesFromName(nodeStuff.getNodeSharedName(oldExternalNode));
+            List<CyEdge> oldEdges = getTargetsOld(oldExtNode);
+            // oldEdges should be empty here, because the oldExtNode is present in similar nodes
+            List<CyNode> similarNodes = nodeStuff.getExtNodesFromName(nodeStuff.getNodeSharedName(oldExtNode));
 
             for (CyNode similarNode : similarNodes) {
                 oldEdges.addAll(getTargetsOld(similarNode));
@@ -128,8 +129,9 @@ public class EdgeStuff {
                     // oldSources.add(oldSourceNode);       MAYBE NOT NEEDED (are keys of HashMap)
                 }
             }
-            fullTargetNodeToEdgeMap.put(oldExternalNode, targetNodeToEdgeMap);
-
+            fullTargetNodeToEdgeMap.put(oldExtNode, targetNodeToEdgeMap);
+            // I can make the hashmap easier to understand if i just map to the list of connected nodes and then later
+            // use the method to get the connecting edge between the external node and all the nodes in the list.
             // I need oldExternalNode, OldSources, sourceNodeToEdgeMap
             // we give the first (as keys) and last one to the full map
         }
