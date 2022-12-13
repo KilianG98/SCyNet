@@ -50,7 +50,7 @@ public class EdgeStuff {
                     } else {
                     CyNode comp = nodeStuff.getIntCompNodeForAnyNode(oSource);
                     CyEdge edge = makeEdge(comp,nodeStuff.getNewNode(oldExtNode));
-                    edgeTributes(edge, comp, oldExtNode);
+                    edgeTributes(edge, oSource, oldExtNode);
 
                 }
 
@@ -73,10 +73,8 @@ public class EdgeStuff {
                     CyEdge edge = makeEdge(nodeStuff.getNewNode(oldExtNode), comp);
                     edgeTributes(edge, oldExtNode, oTarget);
                 }
-
             }
         }
-
     }
 
     private HashMap<CyNode, List<CyEdge>> mkMapOfOutEdges() {
@@ -140,13 +138,14 @@ public class EdgeStuff {
             newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("Target", newNetwork.getDefaultNodeTable().getRow(target.getSUID()).get("shared Name", String.class));
             return newEdge;
         }else {
-            CyEdge existingEdge = newNetwork.getConnectingEdgeList(source, target, CyEdge.Type.DIRECTED).get(0);
-            return existingEdge;
+            return newNetwork.getConnectingEdgeList(source, target, CyEdge.Type.DIRECTED).get(0);
         }
     }
     private void edgeTributes(CyEdge currentEdge, CyNode oldSource, CyNode oldTarget){
 
         List<CyEdge> oldEdges = oldNetwork.getConnectingEdgeList(oldSource, oldTarget, CyEdge.Type.ANY);
+        System.out.println("OLD EDGES: ");
+        System.out.println(oldEdges);
         String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
         String targetName = oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("shared name", String.class);
         Double stoichiometry = 0.0;
