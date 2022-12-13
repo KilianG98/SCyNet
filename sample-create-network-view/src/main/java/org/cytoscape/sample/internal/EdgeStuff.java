@@ -47,11 +47,11 @@ public class EdgeStuff {
                 if (oldExternalNodes.contains(oSource)) {
                     CyEdge edge = makeEdge(nodeStuff.getNewNode(oSource), nodeStuff.getNewNode(oldExtNode));
                     edgeTributes(edge, oSource, oldExtNode);
-
-                } else {
+                    } else {
                     CyNode comp = nodeStuff.getIntCompNodeForAnyNode(oSource);
                     CyEdge edge = makeEdge(comp,nodeStuff.getNewNode(oldExtNode));
                     edgeTributes(edge, comp, oldExtNode);
+
                 }
 
             }
@@ -65,13 +65,13 @@ public class EdgeStuff {
             for (CyNode oTarget : oldTargets) {
 
                 if (oldExternalNodes.contains(oTarget)) {
-                    CyEdge edge = makeEdge(nodeStuff.getNewNode(oldExtNode), nodeStuff.getNewNode(oTarget));
-                    edgeTributes(edge, oldExtNode, oTarget);
-
+                    System.out.println("es passiert!!");
+                    CyEdge edge =makeEdge(nodeStuff.getNewNode(oldExtNode), nodeStuff.getNewNode(oTarget));
+                    edgeTributes(edge,oldExtNode, oTarget);
                 } else {
                     CyNode comp = nodeStuff.getIntCompNodeForAnyNode(oTarget);
                     CyEdge edge = makeEdge(nodeStuff.getNewNode(oldExtNode), comp);
-                    edgeTributes(edge, oldExtNode, comp);
+                    edgeTributes(edge, oldExtNode, oTarget);
                 }
 
             }

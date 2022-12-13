@@ -176,24 +176,18 @@ public class NodeStuff {
     public String getCompOfNode(CyNode node) {
 
         String comp = oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class);
-        System.out.println("testtesttest");
-        System.out.println(comp);
+
         if (Objects.equals(comp, "")) {
             return "unknown";
         }
         if(comp == null){
-            System.out.println("yay");
+            ;
             return "unknown";
         }
         if (comp.contains("_")) {
-
-            System.out.println(comp.lastIndexOf("_"));
             comp = comp.substring(comp.lastIndexOf('_') + 1).toString();
-            System.out.println(comp);
         }
         if (allCompartments.contains(comp)) {
-            System.out.println("ist enthalten");
-            System.out.println(comp);
             return comp;
         }
         return "unknown";
@@ -214,13 +208,13 @@ public class NodeStuff {
 
         String compartment = getCompOfNode(node);
 
-        System.out.println(compartment);
+
         if (compartment == "unknown"){
             compartment = getNodeCyID(node);
             if (compartment.contains("_")){
-                System.out.println(compartment);
+
                 compartment=compartment.substring(compartment.lastIndexOf("_")+1);
-                System.out.println(compartment);
+
             }else{
                 System.out.println("critical error!!");
                 return getCompNodeFromName("erc0");
@@ -229,7 +223,6 @@ public class NodeStuff {
         if (compartment.charAt(2) == 'e'){
             compartment = getIntCompNameFromExtCompName(compartment);
         }
-        System.out.println(compartment);
         return getCompNodeFromName(compartment);
     }
 
