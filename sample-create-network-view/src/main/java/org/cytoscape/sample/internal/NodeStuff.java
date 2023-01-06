@@ -14,10 +14,10 @@ public class NodeStuff {
     private HashMap<CyNode, CyNode> newToOldNodes;
     private HashMap<String, CyNode> compNameToCompNode;
     private HashMap<CyNode, String> compNodeToCompName;
-    private HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
+    private final HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
     private List<String> allCompartments;
     private List<String> internalCompartments;
-    private List<CyNode> extNodes = new ArrayList<>();
+    private final List<CyNode> extNodes = new ArrayList<>();
 
     // Constructor
     public NodeStuff(CyNetwork oldNetwork, CyNetwork newNetwork) {
@@ -183,8 +183,8 @@ public class NodeStuff {
         if (allCompartments.contains(comp)) {
             return comp;
         }
-        if (Objects.equals(comp, ""))    {return "unknown";}
         if (comp == null)                   {return "unknown";}
+        if (Objects.equals(comp, ""))    {return "unknown";}
         if (comp.contains("_"))             {comp = comp.substring(comp.lastIndexOf('_') + 1).toString();}
         if (allCompartments.contains(comp)) {return comp;}
         return "unknown";
@@ -200,10 +200,10 @@ public class NodeStuff {
 
     public CyNode getIntCompNodeForAnyNode(CyNode node){
         String compartment = getCompOfNode(node);
-        if (compartment == "unknown"){
+        if (Objects.equals(compartment, "unknown")){
             compartment = getNodeCyID(node);
             if (compartment.contains("_"))  {compartment=compartment.substring(compartment.lastIndexOf("_")+1);}
-            else                            {System.out.println("critical error!!"); return getCompNodeFromName("erc0");}
+            else                            {return getCompNodeFromName("erc0");}
         }
         if (compartment.charAt(2) == 'e'){
             compartment = getIntCompNameFromExtCompName(compartment);
@@ -217,9 +217,7 @@ public class NodeStuff {
 
     public String getIntCompNameFromExtCompName(String extComp){
         for(String intComp: internalCompartments){
-            if (intComp.substring(0,2).equals(extComp.substring(0,2))){
-                return intComp;
-            }
+            if (intComp.substring(0,2).equals(extComp.substring(0,2))) {return intComp;}
         }
         return"unknown";
     }
