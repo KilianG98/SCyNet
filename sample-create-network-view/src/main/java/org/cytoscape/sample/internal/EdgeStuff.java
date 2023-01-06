@@ -13,17 +13,14 @@ public class EdgeStuff {
     private final HashMap<CyNode, List<CyEdge>> outgoingEdges;
     private final HashMap<CyNode, List<CyEdge>> incomingEdges;
     private final List<String> edgeIDs;
-<<<<<<< Updated upstream
     private final List<CyNode> externalNodes;
     private  HashMap<CyNode, HashMap<CyNode, List<CyEdge>>> fullSourceNodeToEdgeMap;
     private  HashMap<CyNode, HashMap<CyNode, List<CyEdge>>> fullTargetNodeToEdgeMap;
-=======
     private final List<CyNode> oldExternalNodes;
 
     private List<CyEdge> EdgeIds = new ArrayList<>();
     private HashMap<CyNode, Set<CyNode>> sourceToTargets = new HashMap<>();
     private HashMap <CyNode, Set<CyNode>> targetToSources = new HashMap<>();
->>>>>>> Stashed changes
 
     public EdgeStuff(CyNetwork oldNetwork, CyNetwork newNetwork, NodeStuff nodeStuff) {
         this.edgeIDs = new ArrayList<>();
@@ -70,7 +67,6 @@ public class EdgeStuff {
         return new ArrayList<>(edgeSources);
     }
 
-<<<<<<< Updated upstream
     private void makeEdgesToNode(List<CyNode> oldExtNodes) {
         int counterID = 0;
         // This I will need WHEN I SEPARATE THE METHODS
@@ -98,7 +94,6 @@ public class EdgeStuff {
                 } else {
                     sourceNodeToEdgeMap.put(oldSourceNode, oldSourceEdges);
                     // oldSources.add(oldSourceNode);       MAYBE NOT NEEDED (are keys of HashMap)
-=======
     private void makeEdgesToNode() {
         // using the extNodes from NodeStuff, this creates all Edges to every external Node
         for (CyNode oldExtNode : oldExternalNodes) {
@@ -111,7 +106,6 @@ public class EdgeStuff {
                     CyNode comp = nodeStuff.getIntCompNodeForAnyNode(oSource);
                     CyEdge edge = makeEdge(comp,nodeStuff.getNewNode(oldExtNode));
                     edgeTributesComp(edge, oSource, oldExtNode, true);
->>>>>>> Stashed changes
                 }
             }
             fullSourceNodeToEdgeMap.put(oldExternalNode, sourceNodeToEdgeMap);
@@ -123,7 +117,6 @@ public class EdgeStuff {
         makeEdgesIn();
     }
 
-<<<<<<< Updated upstream
     private void makeEdgesFromNode(List<CyNode> oldExtNodes) {
         int counterID = 0;
         // This I will need WHEN I SEPARATE THE METHODS
@@ -149,7 +142,6 @@ public class EdgeStuff {
                     targetNodeToEdgeMap.get(oldTargetNode).add(oldEdge);
                     // oldSources.add(oldSourceNode);       MAYBE NOT NEEDED (are keys of HashMap)
 
-=======
     private void makeEdgesFromNode(){
         // using the extNodes from NodeStuff, this creates all Edges from every external Node
         for (CyNode oldExtNode : oldExternalNodes) {
@@ -159,7 +151,6 @@ public class EdgeStuff {
                     System.out.println("es passiert!!");
                     CyEdge edge = makeEdge(nodeStuff.getNewNode(oldExtNode), nodeStuff.getNewNode(oTarget));
                     edgeTributes(edge, oldExtNode, oTarget);
->>>>>>> Stashed changes
                 } else {
                     targetNodeToEdgeMap.put(oldTargetNode, oldTargetEdges);
                     // oldSources.add(oldSourceNode);       MAYBE NOT NEEDED (are keys of HashMap)
@@ -175,7 +166,6 @@ public class EdgeStuff {
         makeEdgesOut();
     }
 
-<<<<<<< Updated upstream
     private void makeEdgesIn() {
         Set<CyNode> oldExtNodes = fullSourceNodeToEdgeMap.keySet();
         int counterID = 0;
@@ -190,7 +180,6 @@ public class EdgeStuff {
                     Double next_stoichiometry = oldNetwork.getDefaultEdgeTable().getRow(oldSourceEdge.getSUID()).get("stoichiometry", Double.class);
                     if (next_stoichiometry != null) {
                         current_stoichiometry += next_stoichiometry;
-=======
     private HashMap<CyNode, List<CyEdge>> mkMapOfOutEdges() {
         // makes Map for outgoing Edges of every Node from the old Network
         HashMap<CyNode, List<CyEdge>> outEdges = new HashMap<>();
@@ -220,7 +209,6 @@ public class EdgeStuff {
                     oldNeighbors.add(oldEdge.getSource());
                     if (!sourceToTargets.containsKey(sNode)) {
                         sourceToTargets.put(sNode, new HashSet<CyNode>());
->>>>>>> Stashed changes
                     }
                 }
                 if (externalNodes.contains(oldSource)) {//this never happens in our network
@@ -284,7 +272,6 @@ public class EdgeStuff {
                 }
             }
         }
-<<<<<<< Updated upstream
     }
 
     private void makeEdgesOut() {
@@ -363,7 +350,6 @@ public class EdgeStuff {
                     }
                 }
             }
-=======
         return oldNeighbors;
     }
 
@@ -432,7 +418,6 @@ public class EdgeStuff {
         for (CyEdge oldEdge : oldEdges) {
             Double stoich = oldNetwork.getDefaultEdgeTable().getRow(oldEdge.getSUID()).get("stoichiometry", Double.class);
             if(stoich !=null) {stoichiometry += stoich;}
->>>>>>> Stashed changes
         }
     }
 }

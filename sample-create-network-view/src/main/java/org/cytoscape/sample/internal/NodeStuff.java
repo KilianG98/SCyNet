@@ -14,17 +14,11 @@ public class NodeStuff {
     private HashMap<CyNode, CyNode> newToOldNodes;
     private HashMap<String, CyNode> compNameToCompNode;
     private HashMap<CyNode, String> compNodeToCompName;
-<<<<<<< Updated upstream
     private HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
-    final private List<String> allCompartments;
-    final private List<String> internalCompartments;
-    private List<CyNode> extNodes = new ArrayList<>();
-=======
-    private final HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
     private List<String> allCompartments;
     private List<String> internalCompartments;
-    private final List<CyNode> extNodes = new ArrayList<>();
->>>>>>> Stashed changes
+    private List<CyNode> extNodes = new ArrayList<>();
+
     // Constructor
     public NodeStuff(CyNetwork oldNetwork, CyNetwork newNetwork) {
         this.oldNetwork = oldNetwork;
@@ -76,12 +70,8 @@ public class NodeStuff {
                 }
             }
         }
-<<<<<<< Updated upstream
-        return compartments;
-=======
         System.out.println(compartments);
         this.allCompartments = compartments;
->>>>>>> Stashed changes
     }
 
     private void createIntComps() {
@@ -186,7 +176,6 @@ public class NodeStuff {
 
         String name = oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class);
 
-<<<<<<< Updated upstream
         if (Objects.equals(name, "")) {
             return "unknown";
         }
@@ -194,12 +183,10 @@ public class NodeStuff {
         if (allCompartments.contains(comp)) {
             return comp;
         }
-=======
         if (Objects.equals(comp, ""))    {return "unknown";}
         if (comp == null)                   {return "unknown";}
         if (comp.contains("_"))             {comp = comp.substring(comp.lastIndexOf('_') + 1).toString();}
         if (allCompartments.contains(comp)) {return comp;}
->>>>>>> Stashed changes
         return "unknown";
     }
 
@@ -209,10 +196,6 @@ public class NodeStuff {
 
     public String getNodeSharedName(CyNode oldNode) {return oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("shared name", String.class);}
 
-<<<<<<< Updated upstream
-    public String getNodeCyID(CyNode node) {
-        return oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("CyID", String.class);
-=======
     public String getNodeCyID(CyNode node) {return oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("CyID", String.class);}
 
     public CyNode getIntCompNodeForAnyNode(CyNode node){
@@ -226,15 +209,12 @@ public class NodeStuff {
             compartment = getIntCompNameFromExtCompName(compartment);
         }
         return getCompNodeFromName(compartment);
->>>>>>> Stashed changes
     }
 
     public List<String> getIntComps(){
         return internalCompartments;
     }
 
-<<<<<<< Updated upstream
-=======
     public String getIntCompNameFromExtCompName(String extComp){
         for(String intComp: internalCompartments){
             if (intComp.substring(0,2).equals(extComp.substring(0,2))){
@@ -265,5 +245,4 @@ public class NodeStuff {
         return allCompartments;
     }
 
->>>>>>> Stashed changes
 }
