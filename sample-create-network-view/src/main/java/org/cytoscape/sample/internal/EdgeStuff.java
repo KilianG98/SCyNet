@@ -13,9 +13,17 @@ public class EdgeStuff {
     private final HashMap<CyNode, List<CyEdge>> outgoingEdges;
     private final HashMap<CyNode, List<CyEdge>> incomingEdges;
     private final List<String> edgeIDs;
+<<<<<<< Updated upstream
     private final List<CyNode> externalNodes;
     private  HashMap<CyNode, HashMap<CyNode, List<CyEdge>>> fullSourceNodeToEdgeMap;
     private  HashMap<CyNode, HashMap<CyNode, List<CyEdge>>> fullTargetNodeToEdgeMap;
+=======
+    private final List<CyNode> oldExternalNodes;
+
+    private List<CyEdge> EdgeIds = new ArrayList<>();
+    private HashMap<CyNode, Set<CyNode>> sourceToTargets = new HashMap<>();
+    private HashMap <CyNode, Set<CyNode>> targetToSources = new HashMap<>();
+>>>>>>> Stashed changes
 
     public EdgeStuff(CyNetwork oldNetwork, CyNetwork newNetwork, NodeStuff nodeStuff) {
         this.edgeIDs = new ArrayList<>();
@@ -43,6 +51,7 @@ public class EdgeStuff {
         return inEdges;
     }
     private void makeAllEdges() {
+        // makes all columns in the new Edge-Table and then creates all the Edges to and from a Node
         newNetwork.getDefaultEdgeTable().createColumn("source", String.class, true);
         newNetwork.getDefaultEdgeTable().createColumn("target", String.class, true);
         newNetwork.getDefaultEdgeTable().createColumn("edgeID", String.class, true);
@@ -61,6 +70,7 @@ public class EdgeStuff {
         return new ArrayList<>(edgeSources);
     }
 
+<<<<<<< Updated upstream
     private void makeEdgesToNode(List<CyNode> oldExtNodes) {
         int counterID = 0;
         // This I will need WHEN I SEPARATE THE METHODS
@@ -88,6 +98,20 @@ public class EdgeStuff {
                 } else {
                     sourceNodeToEdgeMap.put(oldSourceNode, oldSourceEdges);
                     // oldSources.add(oldSourceNode);       MAYBE NOT NEEDED (are keys of HashMap)
+=======
+    private void makeEdgesToNode() {
+        // using the extNodes from NodeStuff, this creates all Edges to every external Node
+        for (CyNode oldExtNode : oldExternalNodes) {
+            List<CyNode> oldSources = getAllNeighbors(oldExtNode, "Sources");
+            for (CyNode oSource : oldSources) {
+                if (oldExternalNodes.contains(oSource)) {
+                    CyEdge edge = makeEdge(nodeStuff.getNewNode(oSource), nodeStuff.getNewNode(oldExtNode));
+                    edgeTributes(edge, oSource, oldExtNode);
+                    } else {
+                    CyNode comp = nodeStuff.getIntCompNodeForAnyNode(oSource);
+                    CyEdge edge = makeEdge(comp,nodeStuff.getNewNode(oldExtNode));
+                    edgeTributesComp(edge, oSource, oldExtNode, true);
+>>>>>>> Stashed changes
                 }
             }
             fullSourceNodeToEdgeMap.put(oldExternalNode, sourceNodeToEdgeMap);
@@ -99,6 +123,7 @@ public class EdgeStuff {
         makeEdgesIn();
     }
 
+<<<<<<< Updated upstream
     private void makeEdgesFromNode(List<CyNode> oldExtNodes) {
         int counterID = 0;
         // This I will need WHEN I SEPARATE THE METHODS
@@ -124,6 +149,17 @@ public class EdgeStuff {
                     targetNodeToEdgeMap.get(oldTargetNode).add(oldEdge);
                     // oldSources.add(oldSourceNode);       MAYBE NOT NEEDED (are keys of HashMap)
 
+=======
+    private void makeEdgesFromNode(){
+        // using the extNodes from NodeStuff, this creates all Edges from every external Node
+        for (CyNode oldExtNode : oldExternalNodes) {
+            List<CyNode> oldTargets = getAllNeighbors(oldExtNode, "Targets");
+            for (CyNode oTarget : oldTargets) {
+                if (oldExternalNodes.contains(oTarget)) {
+                    System.out.println("es passiert!!");
+                    CyEdge edge = makeEdge(nodeStuff.getNewNode(oldExtNode), nodeStuff.getNewNode(oTarget));
+                    edgeTributes(edge, oldExtNode, oTarget);
+>>>>>>> Stashed changes
                 } else {
                     targetNodeToEdgeMap.put(oldTargetNode, oldTargetEdges);
                     // oldSources.add(oldSourceNode);       MAYBE NOT NEEDED (are keys of HashMap)
@@ -139,6 +175,7 @@ public class EdgeStuff {
         makeEdgesOut();
     }
 
+<<<<<<< Updated upstream
     private void makeEdgesIn() {
         Set<CyNode> oldExtNodes = fullSourceNodeToEdgeMap.keySet();
         int counterID = 0;
@@ -153,6 +190,37 @@ public class EdgeStuff {
                     Double next_stoichiometry = oldNetwork.getDefaultEdgeTable().getRow(oldSourceEdge.getSUID()).get("stoichiometry", Double.class);
                     if (next_stoichiometry != null) {
                         current_stoichiometry += next_stoichiometry;
+=======
+    private HashMap<CyNode, List<CyEdge>> mkMapOfOutEdges() {
+        // makes Map for outgoing Edges of every Node from the old Network
+        HashMap<CyNode, List<CyEdge>> outEdges = new HashMap<>();
+        for (CyNode cyNode : cyNodeList) {
+            outEdges.put(cyNode, oldNetwork.getAdjacentEdgeList(cyNode, CyEdge.Type.OUTGOING));
+        }
+        return outEdges;
+    }
+
+    private HashMap<CyNode, List<CyEdge>> mkMapOfInEdges() {
+        // makes Map for incoming Edges of every Node from the old Network
+        HashMap<CyNode, List<CyEdge>> inEdges = new HashMap<>();
+        for (CyNode cyNode : cyNodeList) {
+            inEdges.put(cyNode, oldNetwork.getAdjacentEdgeList(cyNode, CyEdge.Type.INCOMING));
+        }
+        return inEdges;
+    }
+
+    private List<CyNode> getAllNeighbors (CyNode oldExtNode, String direction ) {
+        // uses every Node with the same name in the old Network to create either a list of outgoing or incoming Node connections
+        List<CyNode> similarNodes = nodeStuff.getExtNodesFromName(nodeStuff.getNodeSharedName(oldExtNode));
+        List<CyNode> oldNeighbors = new ArrayList<>();
+
+        for (CyNode sNode : similarNodes) {
+            if (direction.equals("Sources")) {
+                for (CyEdge oldEdge : getSourcesOld(sNode)) {
+                    oldNeighbors.add(oldEdge.getSource());
+                    if (!sourceToTargets.containsKey(sNode)) {
+                        sourceToTargets.put(sNode, new HashSet<CyNode>());
+>>>>>>> Stashed changes
                     }
                 }
                 if (externalNodes.contains(oldSource)) {//this never happens in our network
@@ -216,6 +284,7 @@ public class EdgeStuff {
                 }
             }
         }
+<<<<<<< Updated upstream
     }
 
     private void makeEdgesOut() {
@@ -294,6 +363,76 @@ public class EdgeStuff {
                     }
                 }
             }
+=======
+        return oldNeighbors;
+    }
+
+    private List<CyEdge> getTargetsOld (CyNode cyNode){
+        // gives us a list of Edges which are outgoing from a Node
+        List<CyEdge> edgeTargets = outgoingEdges.get(cyNode);
+        return new ArrayList<>(edgeTargets);
+    }
+
+    private List<CyEdge> getSourcesOld (CyNode cyNode){
+        // gives us a list of Edges which are incoming from a Node
+        List<CyEdge> edgeSources = incomingEdges.get(cyNode);
+        return new ArrayList<>(edgeSources);
+    }
+
+    private CyEdge makeEdge (CyNode source, CyNode target){
+        // makes a Edge from Source to Target and adds an ID to the edgeIDs and returns it (first created if one already exists
+        String edgeID = source.getSUID().toString().concat("-".concat(target.getSUID().toString()));
+        if(!edgeIDs.contains(edgeID)) {
+            edgeIDs.add(edgeID);
+            CyEdge newEdge = newNetwork.addEdge(source, target, true);
+            newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("Source", newNetwork.getDefaultNodeTable().getRow(source.getSUID()).get("shared Name", String.class));
+            newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).set("Target", newNetwork.getDefaultNodeTable().getRow(target.getSUID()).get("shared Name", String.class));
+            return newEdge;
+        }else {return newNetwork.getConnectingEdgeList(source, target, CyEdge.Type.DIRECTED).get(0);}
+    }
+
+    private void edgeTributes(CyEdge currentEdge, CyNode oldSource, CyNode oldTarget){
+        // adds all the Attributes of an Edge to it using the information from its Source and Target
+        List<CyEdge> oldEdges = oldNetwork.getConnectingEdgeList(oldSource, oldTarget, CyEdge.Type.ANY);
+        String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
+        String targetName = oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("shared name", String.class);
+        newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
+        newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
+        // Getting the correct stoichiometry?
+        Double stoichiometry = 0.0;
+        for (CyEdge oldEdge : oldEdges) {
+            Double currentStoichiometry = oldNetwork.getDefaultEdgeTable().getRow(oldEdge.getSUID()).get("stoichiometry", Double.class);
+            if(currentStoichiometry!=null) {stoichiometry += currentStoichiometry;}
+        }
+        newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("stoichiometry", stoichiometry);
+    }
+
+    private void edgeTributesComp(CyEdge currentEdge, CyNode oldSource, CyNode oldTarget, boolean sourceIsComp){
+        // adds all the Attributes of an Edge to it using the information from its Source and Target if Source or Target are a compartment Node
+        if (sourceIsComp){
+            String sourceName = nodeStuff.getCompNameFromNode(nodeStuff.getIntCompNodeForAnyNode(oldSource));
+            String targetName = oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("shared name", String.class);
+            String sharedName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared interaction", "EXPORT");
+        } else {
+            String targetName = nodeStuff.getCompNameFromNode(nodeStuff.getIntCompNodeForAnyNode(oldTarget));
+            String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
+            String sharedName = sourceName.concat(" - Import");
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared interaction", "IMPORT");
+        }
+        // Getting the correct stoichiometry?
+        List<CyEdge> oldEdges = oldNetwork.getConnectingEdgeList(oldSource, oldTarget, CyEdge.Type.ANY);
+        Double stoichiometry = 0.0;
+        for (CyEdge oldEdge : oldEdges) {
+            Double stoich = oldNetwork.getDefaultEdgeTable().getRow(oldEdge.getSUID()).get("stoichiometry", Double.class);
+            if(stoich !=null) {stoichiometry += stoich;}
+>>>>>>> Stashed changes
         }
     }
 }
