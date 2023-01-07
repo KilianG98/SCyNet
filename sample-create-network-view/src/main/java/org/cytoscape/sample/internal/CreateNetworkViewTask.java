@@ -10,11 +10,8 @@ import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.work.AbstractTask;
-import org.cytoscape.work.AbstractTaskManager;
-import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
 
-import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 import java.util.*;
@@ -24,7 +21,7 @@ import java.util.List;
 public class CreateNetworkViewTask extends AbstractTask {
 
 
-	private NodeStuff nodeStuff;
+	private CreateNodes createNodes;
 	private final CyNetworkFactory cnf;
 	private final CyNetworkViewFactory cnvf;
 	private final CyNetworkViewManager networkViewManager;
@@ -52,8 +49,8 @@ public class CreateNetworkViewTask extends AbstractTask {
 		CyNetwork newNetwork = this.cnf.createNetwork();
 
 		// My Code goes here
-		NodeStuff nodeStuff = new NodeStuff(currentNetwork, newNetwork);
-		EdgeStuff edgeStuff = new EdgeStuff(currentNetwork, newNetwork, nodeStuff);
+		CreateNodes createNodes = new CreateNodes(currentNetwork, newNetwork);
+		CreateEdges createEdges = new CreateEdges(currentNetwork, newNetwork, createNodes);
 
 		// Here I add a name to my Network
 		newNetwork.getDefaultNetworkTable().getRow(newNetwork.getSUID()).set("name", cyNetworkNaming.getSuggestedNetworkTitle("Simplified Network-view"));
@@ -72,10 +69,10 @@ public class CreateNetworkViewTask extends AbstractTask {
 			System.out.println("networkView already existed.");
 		}
 		// Here I change the color/size etc. of the Nodes
-		List<String> compList = nodeStuff.getIntComps();
+		List<String> compList = createNodes.getIntComps();
 
 		for (String compartment: compList) {
-			View<CyNode> nodeView = myView.getNodeView(nodeStuff.getCompNodeFromName(compartment));
+			View<CyNode> nodeView = myView.getNodeView(createNodes.getCompNodeFromName(compartment));
 			double nodeSize = nodeView.getVisualProperty(BasicVisualLexicon.NODE_SIZE) + 100;
 			Paint nodeColor = new ColorUIResource(Color.blue);
 			//nodeView.setVisualProperty(BasicVisualLexicon.NODE_BORDER_WIDTH, lineWidth);
