@@ -24,8 +24,8 @@ public class CreateNodes {
         this.allCompartments = createComps();
         this.internalCompartments = createIntComps();
         createExtNodes();
-        addExtNodesToNewNetwork(extNodes, newNetwork);
-        addCompNodesToNewNetwork(internalCompartments, newNetwork);
+        addExtNodesToNewNetwork(extNodes);
+        addCompNodesToNewNetwork(internalCompartments);
     }
 
     // Private Methods
@@ -84,7 +84,7 @@ public class CreateNodes {
         }
     }
 
-    private void addExtNodesToNewNetwork(List<CyNode> externalNodes, CyNetwork newNetwork) {
+    private void addExtNodesToNewNetwork(List<CyNode> externalNodes) {
         // here the external Nodes are added to the new Network and HashMaps mapping old to new Nodes is created simultaneously
         HashMap<CyNode, CyNode> oldNewTranslation = new HashMap<>();
         HashMap<CyNode, CyNode> newOldTranslation = new HashMap<>();
@@ -100,7 +100,7 @@ public class CreateNodes {
         this.newToOldNodes = newOldTranslation;
     }
 
-    private void addCompNodesToNewNetwork(List<String> compList, CyNetwork newNetwork) {
+    private void addCompNodesToNewNetwork(List<String> compList) {
         // here the compartment Nodes are added to the new Network and HashMaps mapping old to new Nodes is created simultaneously
         HashMap<String, CyNode> compNameTranslation = new HashMap<>();
         HashMap<CyNode, String> compNodeTranslation = new HashMap<>();

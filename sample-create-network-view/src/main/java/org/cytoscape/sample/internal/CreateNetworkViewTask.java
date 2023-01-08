@@ -79,6 +79,19 @@ public class CreateNetworkViewTask extends AbstractTask {
 			nodeView.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, nodeColor);
 			nodeView.setLockedValue(BasicVisualLexicon.NODE_SIZE, nodeSize);
 		}
+		for (CyEdge newEdge: newNetwork.getEdgeList()){
+			String edgeSourceName = newNetwork.getDefaultNodeTable().getRow(newEdge.getSource().getSUID()).get("shared name", String.class);
+			String edgeTargetName = newNetwork.getDefaultNodeTable().getRow(newEdge.getTarget().getSUID()).get("shared name", String.class);
+			View<CyEdge> edgeView = myView.getEdgeView(newEdge);
+			if (compList.contains(edgeSourceName)){
+				Paint edgeColor = new ColorUIResource(Color.blue);
+				edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
+			}
+			if (compList.contains(edgeTargetName)) {
+				Paint edgeColor = new ColorUIResource(Color.green);
+				edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
+			}
+		}
 
 		// Set the variable destroyView to true, the following snippet of code
 		// will destroy a view
