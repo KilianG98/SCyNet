@@ -1,5 +1,6 @@
 package org.cytoscape.sample.internal;
 
+import jdk.internal.math.FloatingDecimal;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -16,9 +17,11 @@ public class CreateEdges {
     private final List<CyNode> oldExternalNodes;
     private final HashMap<CyNode, Set<CyNode>> sourceToTargets = new HashMap<>();
     private final HashMap <CyNode, Set<CyNode>> targetToSources = new HashMap<>();
+    private  HashMap<String, Float> csvMap;
 
-    public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes) {
+    public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Float> csvMap) {
         this.edgeIDs = new ArrayList<>();
+        this.csvMap = csvMap;
         this.newNetwork = newNetwork;
         this.oldNetwork = oldNetwork;
         this.createNodes = createNodes;
@@ -34,6 +37,7 @@ public class CreateEdges {
         newNetwork.getDefaultEdgeTable().createColumn("source", String.class, true);
         newNetwork.getDefaultEdgeTable().createColumn("target", String.class, true);
         newNetwork.getDefaultEdgeTable().createColumn("edgeID", String.class, true);
+        newNetwork.getDefaultEdgeTable().createColumn("flux", Double.class, true);
         newNetwork.getDefaultEdgeTable().createColumn("stoichiometry", Double.class, true);
         makeEdgesToNode();
         makeEdgesFromNode();
@@ -163,18 +167,24 @@ public class CreateEdges {
             String sourceName = createNodes.getCompNameFromNode(createNodes.getIntCompNodeForAnyNode(oldSource));
             String targetName = oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("shared name", String.class);
             String sharedName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
+            Float fluxFloatValue = getFlux(oldSource);
+            Double fluxValue = fluxFloatValue.doubleValue();
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared interaction", "EXPORT");
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("flux", fluxValue);
         } else {
             String targetName = createNodes.getCompNameFromNode(createNodes.getIntCompNodeForAnyNode(oldTarget));
             String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
             String sharedName = sourceName.concat(" - Import");
+            Float fluxFloatValue = getFlux(oldTarget);
+            Double fluxValue = fluxFloatValue.doubleValue();
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared interaction", "IMPORT");
+            newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("flux", fluxValue);
         }
 
         List<CyEdge> oldEdges = oldNetwork.getConnectingEdgeList(oldSource, oldTarget, CyEdge.Type.ANY);
@@ -186,6 +196,22 @@ public class CreateEdges {
             }
         }
         newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("stoichiometry", stoichiometry);
+    }
+
+    private Float getFlux(CyNode oldNode) {
+        String oldType = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("sbml type", String.class);
+        String oldID = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("sbml id", String.class);
+        String[] splitID = oldID.split("_", 0);
+        if (Objects.equals(oldType, "reaction") && Objects.equals(splitID[0], "R")) {
+            String key = "";
+            if (splitID[2].length() == 2) {
+                key = splitID[1].concat(splitID[3]);
+            } else {
+                key = splitID[1].concat(splitID[2]);
+            }
+            return csvMap.get(key);
+        }
+        return 0.0f;
     }
 }
 

@@ -32,6 +32,7 @@ public class CreateNodes {
     private Set<String> createComps() {
         // These are all compartments (external + internal) without the exchange compartment, which is added in the end
         Set<String> comps = new HashSet<>();
+
         List<CyNode> allNodes = oldNetwork.getNodeList();
         for (CyNode currentNode : allNodes) {
             if (oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml id", String.class) != null) {
@@ -41,6 +42,7 @@ public class CreateNodes {
                     if (listId.length > 3) {
                         comps.add(listId[1].concat("c0"));
                         comps.add(listId[1].concat("e0"));
+
                     }
                 }
             }

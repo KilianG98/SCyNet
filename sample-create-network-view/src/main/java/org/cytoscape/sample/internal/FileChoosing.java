@@ -42,7 +42,14 @@ public class FileChoosing {
                 System.out.println(line);
                 String[] values = line.split("\t", 0); // don't truncate empty fields
                 if (!Objects.equals(values[0], "reaction_id")) {
-                    csvMap.put(values[0], Float.parseFloat(values[1]));
+                    String key = "";
+                    String[] splitValues = values[0].split("_",0);
+                    if (splitValues.length == 4) {
+                        key = splitValues[0].concat(splitValues[2]);
+                    } else {
+                        key = splitValues[0].concat(splitValues[1]);
+                    }
+                    csvMap.put(key, Float.parseFloat(values[1]));
                 }
             }
         }

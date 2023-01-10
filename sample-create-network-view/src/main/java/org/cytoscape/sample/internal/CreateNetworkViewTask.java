@@ -49,7 +49,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 		// Here I need to define the currentNetwork variable
 		// I did this by the CyActivator-Route
 
-	
+
 
 
 		// HERE I CREATE THE NEW NETWORK WHICH WE FILL WITH NEW STUFF
@@ -57,7 +57,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 
 		// My Code goes here
 		CreateNodes createNodes = new CreateNodes(currentNetwork, newNetwork);
-		CreateEdges createEdges = new CreateEdges(currentNetwork, newNetwork, createNodes);
+		CreateEdges createEdges = new CreateEdges(currentNetwork, newNetwork, createNodes, csvMap);
 
 		// Here I add a name to my Network
 		newNetwork.getDefaultNetworkTable().getRow(newNetwork.getSUID()).set("name", cyNetworkNaming.getSuggestedNetworkTitle("Simplified Network-view"));

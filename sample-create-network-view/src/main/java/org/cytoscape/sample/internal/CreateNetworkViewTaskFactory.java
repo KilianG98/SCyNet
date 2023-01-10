@@ -37,9 +37,7 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 
 	public TaskIterator createTaskIterator(){
 		FileChoosing newChooser = new FileChoosing();
-		System.out.println(newChooser.giveFile().getName());
 		HashMap<String, Float> csvMap = newChooser.makeMap();
-
 		return new TaskIterator(new CreateNetworkViewTask(cyNetworkNaming, cnf,networkManager, cnvf, networkViewManager, dataSourceManager, currentNetwork, csvMap));
 	}
 }
