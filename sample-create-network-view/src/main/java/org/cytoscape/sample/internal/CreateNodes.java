@@ -10,13 +10,14 @@ public class CreateNodes {
     final private CyNetwork oldNetwork;
     private CyNetwork newNetwork;
     private HashMap<CyNode, CyNode> oldToNewNodes;
-    private HashMap<CyNode, CyNode> newToOldNodes;
+    private HashMap<CyNode, List<CyNode>> newToOldNodes;
     private HashMap<String, CyNode> compNameToCompNode;
     private HashMap<CyNode, String> compNodeToCompName;
     private final HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
     final private Set<String> allCompartments;
     final private List<String> internalCompartments;
     private final List<CyNode> extNodes = new ArrayList<>();
+    private List<CyNode> exchgNodes = new ArrayList<>();
     // Constructor
     public CreateNodes(CyNetwork oldNetwork, CyNetwork newNetwork) {
         this.oldNetwork = oldNetwork;
@@ -24,7 +25,8 @@ public class CreateNodes {
         this.allCompartments = createComps();
         this.internalCompartments = createIntComps();
         createExtNodes();
-        addExtNodesToNewNetwork(extNodes);
+        createExchgNodes();
+        addExtNodesToNewNetwork(exchgNodes);
         addCompNodesToNewNetwork(internalCompartments);
     }
 
@@ -60,7 +62,7 @@ public class CreateNodes {
                 intCompNodeNames.add(compartment);
             }
         }
-        intCompNodeNames.remove("exchg");
+        // intCompNodeNames.remove("exchg");
         return intCompNodeNames;
     }
 
@@ -71,7 +73,7 @@ public class CreateNodes {
 
         for (CyNode currentNode : allNodes) {
             String currentComp = getCompOfMetaboliteNode(currentNode);
-            if (currentComp.charAt(currentComp.length() - 2) == 'e') {
+            if (currentComp.charAt(currentComp.length() - 2) == 'e' || currentComp.equals("exchg")) {
                 String currentName = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("shared name", String.class);
                 if (!externalNodeNames.contains(currentName)) {
                     extNodes.add(currentNode);
@@ -80,23 +82,46 @@ public class CreateNodes {
                     externalNodeList.add(currentNode);
                     extNamesToNodes.put(currentName, externalNodeList);
                 } else {
+                    extNodes.add(currentNode);
                     extNamesToNodes.get(currentName).add(currentNode);
                 }
             }
         }
     }
 
+    private void createExchgNodes() {
+        List<CyNode> allNodes = oldNetwork.getNodeList();
+        List<CyNode> exchangeNode = new ArrayList<>();
+
+        for (CyNode currentNode : allNodes) {
+            String currentComp = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml compartment", String.class);
+            System.out.println(currentComp);
+            if (Objects.equals(currentComp, "exchg")) {
+                exchangeNode.add(currentNode);
+            }
+        }
+        this.exchgNodes = exchangeNode;
+    }
+
     private void addExtNodesToNewNetwork(List<CyNode> externalNodes) {
         // here the external Nodes are added to the new Network and HashMaps mapping old to new Nodes is created simultaneously
         HashMap<CyNode, CyNode> oldNewTranslation = new HashMap<>();
-        HashMap<CyNode, CyNode> newOldTranslation = new HashMap<>();
-        for (CyNode oldNode : externalNodes) {
-            CyNode newNode = newNetwork.addNode();
+        HashMap<CyNode, List<CyNode>> newOldTranslation = new HashMap<>();
+        HashMap<String, CyNode> alreadyPlaced = new HashMap<>();
 
-            String oldName = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("shared name", String.class);
-            newNetwork.getDefaultNodeTable().getRow(newNode.getSUID()).set("shared name", oldName);
-            oldNewTranslation.put(oldNode, newNode);
-            newOldTranslation.put(newNode, oldNode);
+        for (CyNode oldNode : externalNodes) {
+            String nodeSharedName = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("shared name", String.class);
+            if (!alreadyPlaced.containsKey(nodeSharedName)) {
+                CyNode newNode = newNetwork.addNode();
+                alreadyPlaced.put(nodeSharedName, newNode);
+                newNetwork.getDefaultNodeTable().getRow(newNode.getSUID()).set("shared name", nodeSharedName);
+                oldNewTranslation.put(oldNode, newNode);
+                newOldTranslation.put(newNode, Arrays.asList(oldNode));
+            } else {
+                CyNode newNode = alreadyPlaced.get(nodeSharedName);
+                oldNewTranslation.put(oldNode, newNode);
+                newOldTranslation.put(newNode, Arrays.asList(oldNode));
+            }
         }
         this.oldToNewNodes = oldNewTranslation;
         this.newToOldNodes = newOldTranslation;
@@ -151,7 +176,7 @@ public class CreateNodes {
             }
             case "hg": {
                 String[] listId = sbmlId.split("_", 0);
-                if (listId.length > 3) {
+                if (listId.length > 2) {
                     return listId[2];
                 } else {
                     return sbmlId;
@@ -188,7 +213,7 @@ public class CreateNodes {
         return oldToNewNodes.get(oldNode);
     }
 
-    public CyNode getOldNode(CyNode newNode) {
+    public List<CyNode> getOldNode(CyNode newNode) {
         return newToOldNodes.get(newNode);
     }
 
@@ -198,6 +223,10 @@ public class CreateNodes {
 
     public List<CyNode> getExtNodes() {
         return extNodes;
+    }
+
+    public List<CyNode> getExchgNodes() {
+        return exchgNodes;
     }
 
     public List<CyNode> getExtNodesFromName(String nodeName) {

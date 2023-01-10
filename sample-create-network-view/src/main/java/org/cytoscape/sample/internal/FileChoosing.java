@@ -38,8 +38,6 @@ public class FileChoosing {
             BufferedReader br = new BufferedReader(new FileReader(chosenFile));
             while ((line = br.readLine()) != null)   //returns a Boolean value
             {
-
-                System.out.println(line);
                 String[] values = line.split("\t", 0); // don't truncate empty fields
                 if (!Objects.equals(values[0], "reaction_id")) {
                     String key = "";

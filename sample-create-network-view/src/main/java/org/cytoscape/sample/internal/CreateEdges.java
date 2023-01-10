@@ -43,16 +43,23 @@ public class CreateEdges {
         makeEdgesFromNode();
     }
 
+    //private void newMakeEdgesFromNode() {
+     //   for
+    //}
+
     private void makeEdgesToNode() {
         // here we loop through all external Nodes and get their Sources, using these we make edges the external Nodes
         // or compartment Nodes if the Source is in a compartment
-        for (CyNode oldExtNode : oldExternalNodes) {
+        for (CyNode oldExtNode : createNodes.getExchgNodes()) {
             List<CyNode> oldSources = getAllNeighbors(oldExtNode, "Sources");
             for (CyNode oSource : oldSources) {
                 if (oldExternalNodes.contains(oSource)) {
                     CyEdge edge = makeEdge(createNodes.getNewNode(oSource), createNodes.getNewNode(oldExtNode));
                     edgeTributes(edge, oSource, oldExtNode);
                     } else {
+                    System.out.println(oSource);
+                    System.out.println(oldNetwork.getDefaultNodeTable().getRow(oSource.getSUID()).get("shared name", String.class));
+                    System.out.println(oldNetwork.getDefaultNodeTable().getRow(oSource.getSUID()).get("sbml id", String.class));
                     CyNode comp = createNodes.getIntCompNodeForAnyNode(oSource);
                     CyEdge edge = makeEdge(comp, createNodes.getNewNode(oldExtNode));
                     edgeTributesComp(edge, oSource, oldExtNode, true);
@@ -64,7 +71,7 @@ public class CreateEdges {
     private void makeEdgesFromNode(){
         // here we loop through all external Nodes and get their Targets, using these we make edges the external Nodes
         // or compartment Nodes if the Target is in a compartment
-        for (CyNode oldExtNode : oldExternalNodes) {
+        for (CyNode oldExtNode : createNodes.getExchgNodes()) {
             List<CyNode> oldTargets = getAllNeighbors(oldExtNode, "Targets");
             for (CyNode oTarget : oldTargets) {
                 if (oldExternalNodes.contains(oTarget)) {
@@ -99,10 +106,24 @@ public class CreateEdges {
 
     private List<CyNode> getAllNeighbors (CyNode oldExtNode, String direction ) {
         // here we get all neighbors of a Node, by looking at all the Sources/Targets of all the Nodes with the same name
-        List<CyNode> similarNodes = createNodes.getExtNodesFromName(createNodes.getNodeSharedName(oldExtNode));
+        // List<CyNode> similarNodes = createNodes.getExtNodesFromName(createNodes.getNodeSharedName(oldExtNode));
         List<CyNode> oldNeighbors = new ArrayList<>();
 
+        if (Objects.equals(direction, "Sources")) {
+            List<CyEdge> edges = incomingEdges.get(oldExtNode);
+            for (CyEdge edge : edges) {
+                oldNeighbors.add(edge.getSource());
+            }
+        } else {
+            List<CyEdge> edges = outgoingEdges.get(oldExtNode);
+            for (CyEdge edge : edges) {
+                oldNeighbors.add(edge.getTarget());
+            }
+        }
+
+        /*
         for (CyNode sNode : similarNodes) {
+            System.out.println(sNode);
             if (direction.equals("Sources")) {
                 for (CyEdge oldEdge : incomingEdges.get(sNode)) {
                     oldNeighbors.add(oldEdge.getSource());
@@ -120,13 +141,15 @@ public class CreateEdges {
                     targetToSources.get(sNode).add(oldEdge.getSource());
                 }
             }
-        }
+        }*/
         return oldNeighbors;
     }
 
     private CyEdge makeEdge (CyNode source, CyNode target){
         // here an Edge is created if it does not already exist, which is checked by its individual edgeID
         // otherwise the already created Edge is returned
+        System.out.println(source);
+        System.out.println(target);
         String edgeID = source.getSUID().toString().concat("-".concat(target.getSUID().toString()));
 
         if(!edgeIDs.contains(edgeID)) {
