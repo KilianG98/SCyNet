@@ -14,8 +14,7 @@ import org.cytoscape.work.TaskMonitor;
 
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -31,11 +30,11 @@ public class CreateNetworkViewTask extends AbstractTask {
 	private final CyNetworkNaming cyNetworkNaming;
 	private final DataSourceManager dataSourceManager;
 	private final CyNetwork currentNetwork;
-	private File csvFile;
+	private HashMap<String, Float> csvMap;
 
 	public CreateNetworkViewTask(CyNetworkNaming cyNetworkNaming, CyNetworkFactory cnf, CyNetworkManager networkManager,
 								 CyNetworkViewFactory cnvf, final CyNetworkViewManager networkViewManager,
-								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, File csvFile) {
+								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Float> csvMap) {
 		this.cnf = cnf;
 		this.cnvf = cnvf;
 		this.networkViewManager = networkViewManager;
@@ -43,23 +42,14 @@ public class CreateNetworkViewTask extends AbstractTask {
 		this.cyNetworkNaming = cyNetworkNaming;
 		this.dataSourceManager = dataSourceManager;
 		this.currentNetwork = currentNetwork;
-		this.csvFile = csvFile;
+		this.csvMap = csvMap;
 	}
 
 	public void run(TaskMonitor monitor) throws FileNotFoundException {
 		// Here I need to define the currentNetwork variable
 		// I did this by the CyActivator-Route
 
-		/*
-		Scanner sc = new Scanner(csvFile);
-		sc.useDelimiter("\t");   //sets the delimiter pattern
-		while (sc.hasNext())  //returns a boolean value
-		{
-			System.out.print(sc.next());  //find and returns the next complete token from this scanner
-			System.out.println("Hey");
-		}
-		sc.close();  //closes the scanner
-		*/
+	
 
 
 		// HERE I CREATE THE NEW NETWORK WHICH WE FILL WITH NEW STUFF

@@ -1,10 +1,16 @@
 package org.cytoscape.sample.internal;
 
 import javax.swing.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class FileChoosing {
     private File chosenFile;
+    private HashMap<String, Float> csvMap;
 
     public FileChoosing()
     {
@@ -17,14 +23,32 @@ public class FileChoosing {
         {
             // Ausgabe der ausgewaehlten Datei
             String fileName = chooser.getSelectedFile().getName();
-            if (fileName.substring(fileName.length() - 4, 0).equals(".csv")) {
-                this.chosenFile = chooser.getSelectedFile();
-            } else {
-                System.out.println("This was no csv-file!");
-            }
+            this.chosenFile = chooser.getSelectedFile();
         }
     }
     public File giveFile(){
         return chosenFile;
+    }
+
+    public HashMap<String, Float> makeMap() {
+        HashMap<String, Float> csvMap = new HashMap<>();
+        String line = "";
+        try {
+            //parsing a CSV file into BufferedReader class constructor
+            BufferedReader br = new BufferedReader(new FileReader(chosenFile));
+            while ((line = br.readLine()) != null)   //returns a Boolean value
+            {
+
+                System.out.println(line);
+                String[] values = line.split("\t", 0); // don't truncate empty fields
+                if (!Objects.equals(values[0], "reaction_id")) {
+                    csvMap.put(values[0], Float.parseFloat(values[1]));
+                }
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return csvMap;
     }
 }

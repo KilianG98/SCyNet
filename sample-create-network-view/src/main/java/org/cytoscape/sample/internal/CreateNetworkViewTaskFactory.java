@@ -11,6 +11,7 @@ import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 import javax.swing.*;
+import java.util.HashMap;
 
 public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 
@@ -36,7 +37,9 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 
 	public TaskIterator createTaskIterator(){
 		FileChoosing newChooser = new FileChoosing();
-		// System.out.println(newChooser.giveFile().getName());
-		return new TaskIterator(new CreateNetworkViewTask(cyNetworkNaming, cnf,networkManager, cnvf, networkViewManager, dataSourceManager, currentNetwork, newChooser.giveFile()));
+		System.out.println(newChooser.giveFile().getName());
+		HashMap<String, Float> csvMap = newChooser.makeMap();
+
+		return new TaskIterator(new CreateNetworkViewTask(cyNetworkNaming, cnf,networkManager, cnvf, networkViewManager, dataSourceManager, currentNetwork, csvMap));
 	}
 }
