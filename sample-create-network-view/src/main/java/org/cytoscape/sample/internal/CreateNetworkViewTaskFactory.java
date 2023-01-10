@@ -10,6 +10,8 @@ import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
+import javax.swing.*;
+
 public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 
 	private final CyNetworkFactory cnf;
@@ -33,6 +35,8 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 	}
 
 	public TaskIterator createTaskIterator(){
-		return new TaskIterator(new CreateNetworkViewTask(cyNetworkNaming, cnf,networkManager, cnvf, networkViewManager, dataSourceManager, currentNetwork));
+		FileChoosing newChooser = new FileChoosing();
+		// System.out.println(newChooser.giveFile().getName());
+		return new TaskIterator(new CreateNetworkViewTask(cyNetworkNaming, cnf,networkManager, cnvf, networkViewManager, dataSourceManager, currentNetwork, newChooser.giveFile()));
 	}
 }
