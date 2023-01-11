@@ -50,7 +50,7 @@ public class CreateNodes {
             }
         }
         comps.add("exchg");
-        System.out.println(comps);
+
         return comps;
     }
 
@@ -63,6 +63,7 @@ public class CreateNodes {
             }
         }
         // intCompNodeNames.remove("exchg");
+        System.out.println(intCompNodeNames);
         return intCompNodeNames;
     }
 
@@ -95,10 +96,14 @@ public class CreateNodes {
 
         for (CyNode currentNode : allNodes) {
             String currentComp = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml compartment", String.class);
-            System.out.println(currentComp);
-            if (Objects.equals(currentComp, "exchg")) {
-                exchangeNode.add(currentNode);
-            }
+            String currentID = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml id", String.class);
+                if (Objects.equals(currentComp, "exchg")) {
+                    exchangeNode.add(currentNode);
+                }
+                else{if (currentID == "exchg"){
+                        exchangeNode.add(currentNode);
+                    }
+                }
         }
         this.exchgNodes = exchangeNode;
     }
@@ -175,15 +180,10 @@ public class CreateNodes {
                 }
             }
             case "hg": {
-                String[] listId = sbmlId.split("_", 0);
-                if (listId.length > 2) {
-                    return listId[2];
-                } else {
-                    return sbmlId;
-                }
+                return "exchg";
             }
         }
-        return "unknown";
+        return "exchg";
     }
 
     private String getCompOfNode(CyNode node) {
