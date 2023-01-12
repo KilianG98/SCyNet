@@ -10,36 +10,33 @@ import java.util.Objects;
 
 public class FileChoosing {
     private File chosenFile;
-    private HashMap<String, Float> csvMap;
 
     public FileChoosing()
     {
-        // JFileChooser-Objekt erstellen
+        // Here we use the JFileChooser to open a window where the user can select a CSV-file with the fluxes
         JFileChooser chooser = new JFileChooser();
-        // Dialog zum Oeffnen von Dateien anzeigen
-        int rueckgabeWert = chooser.showDialog(null, "Choose the corresponding csv-file.");
-        /* Abfrage, ob auf "Öffnen" geklickt wurde */
-        if(rueckgabeWert == JFileChooser.APPROVE_OPTION)
+        chooser.setDialogTitle("Choose the tab-delimited CSV-file or press CANCEL");
+
+        int fileValue = chooser.showDialog(null, "Choose");
+        // If there was no file selected here, later we will return the empty csvMap with makeMap()
+        if(fileValue == JFileChooser.APPROVE_OPTION)
         {
-            // Ausgabe der ausgewaehlten Datei
-            String fileName = chooser.getSelectedFile().getName();
             this.chosenFile = chooser.getSelectedFile();
         }
     }
 
-    public HashMap<String, Float> makeMap() {
-        HashMap<String, Float> csvMap = new HashMap<>();
+    public HashMap<String, Double> makeMap() {
+        HashMap<String, Double> csvMap = new HashMap<>();
         if (chosenFile == null) {
-            System.out.println("NO FILE");
             return csvMap;
         }
         String line = "";
         try {
-            //parsing a CSV file into BufferedReader class constructor
+            // parsing a CSV file into BufferedReader class constructor
             BufferedReader br = new BufferedReader(new FileReader(chosenFile));
-            while ((line = br.readLine()) != null)   //returns a Boolean value
+            while ((line = br.readLine()) != null)
             {
-                String[] values = line.split("\t", 0); // don't truncate empty fields
+                String[] values = line.split("\t", 0);
                 if (!Objects.equals(values[0], "reaction_id")) {
                     String key = "";
                     String[] splitValues = values[0].split("_",0);
@@ -48,7 +45,7 @@ public class FileChoosing {
                     } else {
                         key = splitValues[0].concat(splitValues[1]);
                     }
-                    csvMap.put(key, Float.parseFloat(values[1]));
+                    csvMap.put(key, Double.parseDouble(values[1]));
                 }
             }
         }

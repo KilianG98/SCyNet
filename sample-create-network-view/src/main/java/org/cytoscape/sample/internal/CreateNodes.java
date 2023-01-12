@@ -8,7 +8,7 @@ import java.util.*;
 public class CreateNodes {
 
     final private CyNetwork oldNetwork;
-    private CyNetwork newNetwork;
+    private final CyNetwork newNetwork;
     private HashMap<CyNode, CyNode> oldToNewNodes;
     private HashMap<CyNode, List<CyNode>> newToOldNodes;
     private HashMap<String, CyNode> compNameToCompNode;
@@ -100,9 +100,10 @@ public class CreateNodes {
                 if (Objects.equals(currentComp, "exchg")) {
                     exchangeNode.add(currentNode);
                 }
-                else{if (currentID == "exchg"){
-                        exchangeNode.add(currentNode);
-                    }
+                else {
+                    // HIER IST WAS FAUL! Wenn ich das durch die vorgeschlagene Syntax ersetze werden 207 mehr Edges gemacht
+                    // Außerdem macht es keinen Unterschied ob das so da ist oder komplett fehlt
+                    if (currentID == "exchg") {exchangeNode.add(currentNode);}
                 }
         }
         this.exchgNodes = exchangeNode;
@@ -116,17 +117,16 @@ public class CreateNodes {
 
         for (CyNode oldNode : externalNodes) {
             String nodeSharedName = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("shared name", String.class);
+            CyNode newNode;
             if (!alreadyPlaced.containsKey(nodeSharedName)) {
-                CyNode newNode = newNetwork.addNode();
+                newNode = newNetwork.addNode();
                 alreadyPlaced.put(nodeSharedName, newNode);
                 newNetwork.getDefaultNodeTable().getRow(newNode.getSUID()).set("shared name", nodeSharedName);
-                oldNewTranslation.put(oldNode, newNode);
-                newOldTranslation.put(newNode, Arrays.asList(oldNode));
             } else {
-                CyNode newNode = alreadyPlaced.get(nodeSharedName);
-                oldNewTranslation.put(oldNode, newNode);
-                newOldTranslation.put(newNode, Arrays.asList(oldNode));
+                newNode = alreadyPlaced.get(nodeSharedName);
             }
+            oldNewTranslation.put(oldNode, newNode);
+            newOldTranslation.put(newNode, Arrays.asList(oldNode));
         }
         this.oldToNewNodes = oldNewTranslation;
         this.newToOldNodes = newOldTranslation;

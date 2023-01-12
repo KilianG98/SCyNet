@@ -1,11 +1,9 @@
 package org.cytoscape.sample.internal;
 
-import jdk.internal.math.FloatingDecimal;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class CreateEdges {
@@ -17,11 +15,9 @@ public class CreateEdges {
     private final HashMap<CyNode, List<CyEdge>> incomingEdges;
     private final List<String> edgeIDs;
     private final List<CyNode> oldExternalNodes;
-    private final HashMap<CyNode, Set<CyNode>> sourceToTargets = new HashMap<>();
-    private final HashMap<CyNode, Set<CyNode>> targetToSources = new HashMap<>();
-    private HashMap<String, Float> csvMap;
+    private final HashMap<String, Double> csvMap;
 
-    public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Float> csvMap) {
+    public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Double> csvMap) {
         this.edgeIDs = new ArrayList<>();
         this.csvMap = csvMap;
         this.newNetwork = newNetwork;
@@ -188,41 +184,40 @@ public class CreateEdges {
                 String sourceName = createNodes.getCompNameFromNode(createNodes.getIntCompNodeForAnyNode(oldSource));
                 String targetName = oldNetwork.getDefaultNodeTable().getRow(oldTarget.getSUID()).get("shared name", String.class);
                 String sharedName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
-                Float fluxFloatValue = getFlux(oldSource);
-                Double fluxValue = fluxFloatValue.doubleValue();
+                String fluxKey = getFluxKey(oldSource);
+                Double fluxValue = getFlux(fluxKey);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared interaction", "EXPORT");
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("flux", fluxValue);
+                newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("name", fluxKey);
             } else {
                 String targetName = createNodes.getCompNameFromNode(createNodes.getIntCompNodeForAnyNode(oldTarget));
                 String sourceName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
                 String sharedName = sourceName.concat(" - Import");
-                Float fluxFloatValue = getFlux(oldTarget);
-                Double fluxValue = fluxFloatValue.doubleValue();
+                String fluxKey = getFluxKey(oldTarget);
+                Double fluxValue = getFlux(fluxKey);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared interaction", "IMPORT");
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("flux", fluxValue);
+                newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("name", fluxKey);
             }
 
             List<CyEdge> oldEdges = oldNetwork.getConnectingEdgeList(oldSource, oldTarget, CyEdge.Type.ANY);
             Double stoichiometry = 0.0;
             for (CyEdge oldEdge : oldEdges) {
-                Double stoich = oldNetwork.getDefaultEdgeTable().getRow(oldEdge.getSUID()).get("stoichiometry", Double.class);
-                if (stoich != null) {
-                    stoichiometry += stoich;
+                Double current_stoichiometry = oldNetwork.getDefaultEdgeTable().getRow(oldEdge.getSUID()).get("stoichiometry", Double.class);
+                if (current_stoichiometry != null) {
+                    stoichiometry += current_stoichiometry;
                 }
             }
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("stoichiometry", stoichiometry);
         }
 
-        private Float getFlux (CyNode oldNode){
-            if (csvMap.isEmpty()) {
-                return 0.0f;
-            }
+        private String getFluxKey(CyNode oldNode){
             String oldType = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("sbml type", String.class);
             String oldID = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("sbml id", String.class);
             String[] splitID = oldID.split("_", 0);
@@ -233,11 +228,19 @@ public class CreateEdges {
                 } else {
                     key = splitID[1].concat(splitID[2]);
                 }
-                return csvMap.get(key);
+                return key;
             }
-            return 0.0f;
+            return "";
+        }
+
+        private Double getFlux(String key) {
+            if (csvMap.isEmpty() || Objects.equals(key, "")) {
+                return 0.0d;
+            }
+            return csvMap.get(key);
         }
     }
+
 
 
 

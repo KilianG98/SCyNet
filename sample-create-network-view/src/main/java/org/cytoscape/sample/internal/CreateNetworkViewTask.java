@@ -21,8 +21,6 @@ import java.util.List;
 
 public class CreateNetworkViewTask extends AbstractTask {
 
-
-	private CreateNodes createNodes;
 	private final CyNetworkFactory cnf;
 	private final CyNetworkViewFactory cnvf;
 	private final CyNetworkViewManager networkViewManager;
@@ -30,11 +28,11 @@ public class CreateNetworkViewTask extends AbstractTask {
 	private final CyNetworkNaming cyNetworkNaming;
 	private final DataSourceManager dataSourceManager;
 	private final CyNetwork currentNetwork;
-	private HashMap<String, Float> csvMap;
+	private final HashMap<String, Double> csvMap;
 
 	public CreateNetworkViewTask(CyNetworkNaming cyNetworkNaming, CyNetworkFactory cnf, CyNetworkManager networkManager,
 								 CyNetworkViewFactory cnvf, final CyNetworkViewManager networkViewManager,
-								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Float> csvMap) {
+								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Double> csvMap) {
 		this.cnf = cnf;
 		this.cnvf = cnvf;
 		this.networkViewManager = networkViewManager;
@@ -46,12 +44,6 @@ public class CreateNetworkViewTask extends AbstractTask {
 	}
 
 	public void run(TaskMonitor monitor) throws FileNotFoundException {
-		// Here I need to define the currentNetwork variable
-		// I did this by the CyActivator-Route
-
-
-
-
 		// HERE I CREATE THE NEW NETWORK WHICH WE FILL WITH NEW STUFF
 		CyNetwork newNetwork = this.cnf.createNetwork();
 
@@ -73,9 +65,9 @@ public class CreateNetworkViewTask extends AbstractTask {
 			myView = cnvf.createNetworkView(newNetwork);
 			networkViewManager.addNetworkView(myView);
 		} else {
-			System.out.println("networkView already existed.");
+			System.out.println("This Network View already existed.");
 		}
-		// Here I change the color/size etc. of the Nodes
+		// Here the color/size/label etc. of the Nodes and Edges is changed
 		List<String> compList = createNodes.getIntComps();
 
 		for (String compartment: compList) {
@@ -89,6 +81,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 		for (CyEdge newEdge: newNetwork.getEdgeList()){
 			String edgeSourceName = newNetwork.getDefaultNodeTable().getRow(newEdge.getSource().getSUID()).get("shared name", String.class);
 			String edgeTargetName = newNetwork.getDefaultNodeTable().getRow(newEdge.getTarget().getSUID()).get("shared name", String.class);
+			Double edgeFlux = newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).get("flux", Double.class);
 			View<CyEdge> edgeView = myView.getEdgeView(newEdge);
 			if (compList.contains(edgeSourceName)){
 				Paint edgeColor = new ColorUIResource(Color.blue);
@@ -98,16 +91,9 @@ public class CreateNetworkViewTask extends AbstractTask {
 				Paint edgeColor = new ColorUIResource(Color.green);
 				edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
 			}
+			if (edgeFlux != 0.0) {
+				edgeView.setLockedValue(BasicVisualLexicon.EDGE_WIDTH, edgeFlux);
+			}
 		}
-
-		// Set the variable destroyView to true, the following snippet of code
-		// will destroy a view
-		boolean destroyView = false;
-		if (destroyView) {
-			networkViewManager.destroyNetworkView(myView);
-		}
-
-		// I ADDED THIS SO THE ALGORITHM JUST GOES OVER THE FIRST NETWORK
-		// break;
 	}
 }
