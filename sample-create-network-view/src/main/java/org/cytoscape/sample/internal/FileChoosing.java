@@ -26,12 +26,13 @@ public class FileChoosing {
             this.chosenFile = chooser.getSelectedFile();
         }
     }
-    public File giveFile(){
-        return chosenFile;
-    }
 
     public HashMap<String, Float> makeMap() {
         HashMap<String, Float> csvMap = new HashMap<>();
+        if (chosenFile == null) {
+            System.out.println("NO FILE");
+            return csvMap;
+        }
         String line = "";
         try {
             //parsing a CSV file into BufferedReader class constructor

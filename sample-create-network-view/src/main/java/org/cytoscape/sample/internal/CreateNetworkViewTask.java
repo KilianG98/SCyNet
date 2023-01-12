@@ -34,7 +34,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 
 	public CreateNetworkViewTask(CyNetworkNaming cyNetworkNaming, CyNetworkFactory cnf, CyNetworkManager networkManager,
 								 CyNetworkViewFactory cnvf, final CyNetworkViewManager networkViewManager,
-								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork) {
+								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Float> csvMap) {
 		this.cnf = cnf;
 		this.cnvf = cnvf;
 		this.networkViewManager = networkViewManager;
