@@ -7,16 +7,11 @@ import org.cytoscape.session.CyNetworkNaming;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
-import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.TaskMonitor;
 
-import javax.swing.plaf.ColorUIResource;
-import java.awt.*;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 
 public class CreateNetworkViewTask extends AbstractTask {
@@ -68,32 +63,6 @@ public class CreateNetworkViewTask extends AbstractTask {
 			System.out.println("This Network View already existed.");
 		}
 		// Here the color/size/label etc. of the Nodes and Edges is changed
-		List<String> compList = createNodes.getIntComps();
-
-		for (String compartment: compList) {
-			View<CyNode> nodeView = myView.getNodeView(createNodes.getCompNodeFromName(compartment));
-			double nodeSize = nodeView.getVisualProperty(BasicVisualLexicon.NODE_SIZE) + 100;
-			Paint nodeColor = new ColorUIResource(Color.blue);
-			//nodeView.setVisualProperty(BasicVisualLexicon.NODE_BORDER_WIDTH, lineWidth);
-			nodeView.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, nodeColor);
-			nodeView.setLockedValue(BasicVisualLexicon.NODE_SIZE, nodeSize);
-		}
-		for (CyEdge newEdge: newNetwork.getEdgeList()){
-			String edgeSourceName = newNetwork.getDefaultNodeTable().getRow(newEdge.getSource().getSUID()).get("shared name", String.class);
-			String edgeTargetName = newNetwork.getDefaultNodeTable().getRow(newEdge.getTarget().getSUID()).get("shared name", String.class);
-			Double edgeFlux = newNetwork.getDefaultEdgeTable().getRow(newEdge.getSUID()).get("flux", Double.class);
-			View<CyEdge> edgeView = myView.getEdgeView(newEdge);
-			if (compList.contains(edgeSourceName)){
-				Paint edgeColor = new ColorUIResource(Color.blue);
-				edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
-			}
-			if (compList.contains(edgeTargetName)) {
-				Paint edgeColor = new ColorUIResource(Color.green);
-				edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
-			}
-			if (edgeFlux != 0.0) {
-				edgeView.setLockedValue(BasicVisualLexicon.EDGE_WIDTH, edgeFlux);
-			}
-		}
+		Aesthetics aesthetics = new Aesthetics(createNodes, newNetwork, myView);
 	}
 }

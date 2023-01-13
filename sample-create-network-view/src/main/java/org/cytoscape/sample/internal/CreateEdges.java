@@ -234,10 +234,11 @@ public class CreateEdges {
         }
 
         private Double getFlux(String key) {
-            if (csvMap.isEmpty() || Objects.equals(key, "")) {
-                return 0.0d;
+            if (csvMap.isEmpty() ||Objects.equals(key, "")) {
+                return null;
+            } else {
+                return csvMap.get(key);
             }
-            return csvMap.get(key);
         }
     }
 

@@ -103,7 +103,7 @@ public class CreateNodes {
                 else {
                     // HIER IST WAS FAUL! Wenn ich das durch die vorgeschlagene Syntax ersetze werden 207 mehr Edges gemacht
                     // Außerdem macht es keinen Unterschied ob das so da ist oder komplett fehlt
-                    if (currentID == "exchg") {exchangeNode.add(currentNode);}
+                    // if (currentID == "exchg") {exchangeNode.add(currentNode);}
                 }
         }
         this.exchgNodes = exchangeNode;
