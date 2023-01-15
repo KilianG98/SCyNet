@@ -16,9 +16,11 @@ public class CreateEdges {
     private final List<String> edgeIDs;
     private final List<CyNode> oldExternalNodes;
     private final HashMap<String, Double> csvMap;
+    private boolean mapAdded = true;
 
     public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Double> csvMap) {
         this.edgeIDs = new ArrayList<>();
+        if (csvMap.isEmpty()) {this.mapAdded = false;}
         this.csvMap = csvMap;
         this.newNetwork = newNetwork;
         this.oldNetwork = oldNetwork;
@@ -53,13 +55,11 @@ public class CreateEdges {
             // They should be merged into one Node.
             List<CyNode> oldSources = getAllNeighbors(oldExchgNode, "Sources");
 
-            System.out.println(oldNetwork.getDefaultNodeTable().getRow(oldExchgNode.getSUID()).get("shared name", String.class));
             for (CyNode oSource : oldSources) {
 
                 if (oldExternalNodes.contains(oSource)) {
                     // this happens for the EXCHG node ALL the exchg metabolites are imported to the compartment.
                     // leads to BLACK edges to the EXCHG node
-                    System.out.println("externalNode");
                     CyEdge edge = makeEdge(createNodes.getNewNode(oSource), createNodes.getNewNode(oldExchgNode));
                     edgeTributes(edge, oSource, oldExchgNode);
                 } else {
@@ -67,10 +67,7 @@ public class CreateEdges {
                     //their sources are Transport reactions, coming from the organism(BLUE edges from organisms to Metabolites)
                     //But also TP reactions from the exchg comp, those are import reactions from outside the model.
                     //Therefore there are GREEN edges beetween all metabolites and the EXCHG-COMP node
-                    System.out.println(oldNetwork.getDefaultNodeTable().getRow(oSource.getSUID()).get("shared name", String.class));
-                    System.out.println(oldNetwork.getDefaultNodeTable().getRow(oSource.getSUID()).get("sbml id", String.class));
                     CyNode comp = createNodes.getIntCompNodeForAnyNode(oSource);
-                    System.out.println(comp);
                     CyEdge edge = makeEdge(comp, createNodes.getNewNode(oldExchgNode));
                     edgeTributesComp(edge, oSource, oldExchgNode, true);
 
@@ -85,13 +82,10 @@ public class CreateEdges {
                 List<CyNode> oldTargets = getAllNeighbors(oldExchgNode, "Targets");
                 for (CyNode oTarget : oldTargets) {
 
-                    System.out.println(oTarget);//this is always 1532516 in the old networK->  EXCHG Node of the old Network
+                    // System.out.println(oTarget);//this is always 1532516 in the old networK->  EXCHG Node of the old Network
                     CyNode comp = createNodes.getIntCompNodeForAnyNode(oTarget);
                     //Compartment Nodes have no SBML ID, therefore EXCHG-COMP is returned by default
                     // -> BLUE Edges betweeen exchg Comp Node and metabolites
-                    System.out.println(createNodes.getCompNameFromNode(comp));
-                    System.out.println(oldNetwork.getDefaultNodeTable().getRow(oTarget.getSUID()).get("sbml type", String.class));
-                    System.out.println(oldNetwork.getDefaultNodeTable().getRow(oldExchgNode.getSUID()).get("shared name", String.class));
                     CyEdge edge = makeEdge(createNodes.getNewNode(oldExchgNode), comp);
                     edgeTributesComp(edge, oldExchgNode, oTarget, false);
                     //There dont appear to be edges going from The EXCHG node to anywhere(which was the reason to add it in the first place)
@@ -145,7 +139,6 @@ public class CreateEdges {
             // otherwise the already created Edge is returned
 
             String edgeID = source.getSUID().toString().concat("-".concat(target.getSUID().toString()));
-            System.out.println(edgeID);
             if (!edgeIDs.contains(edgeID)) {
 
                 edgeIDs.add(edgeID);
@@ -234,7 +227,10 @@ public class CreateEdges {
         }
 
         private Double getFlux(String key) {
-            if (csvMap.isEmpty() ||Objects.equals(key, "")) {
+            if (mapAdded && csvMap.get(key) == null) {
+                return 0.0d;
+            }
+            if (!mapAdded || Objects.equals(key, "")) {
                 return null;
             } else {
                 return csvMap.get(key);

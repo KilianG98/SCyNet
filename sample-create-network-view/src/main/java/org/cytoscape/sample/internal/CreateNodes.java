@@ -96,14 +96,9 @@ public class CreateNodes {
 
         for (CyNode currentNode : allNodes) {
             String currentComp = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml compartment", String.class);
-            String currentID = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml id", String.class);
+            // String currentID = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml id", String.class);
                 if (Objects.equals(currentComp, "exchg")) {
                     exchangeNode.add(currentNode);
-                }
-                else {
-                    // HIER IST WAS FAUL! Wenn ich das durch die vorgeschlagene Syntax ersetze werden 207 mehr Edges gemacht
-                    // Außerdem macht es keinen Unterschied ob das so da ist oder komplett fehlt
-                    // if (currentID == "exchg") {exchangeNode.add(currentNode);}
                 }
         }
         this.exchgNodes = exchangeNode;

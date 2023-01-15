@@ -80,10 +80,12 @@ public class Aesthetics {
                 if (edgeFlux >= 0.0d) {edgeColor = new ColorUIResource(Color.blue);}
                 else {edgeColor = new ColorUIResource(Color.green);}
                 edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
+
                 // Transparency and Width of the Edges is also based on Fluxes
-                if (edgeFlux != 0.0) {
-                    edgeView.setLockedValue(BasicVisualLexicon.EDGE_TRANSPARENCY, (abs(edgeFlux.intValue()) + 2) * 50);
-                    edgeView.setLockedValue(BasicVisualLexicon.EDGE_WIDTH, abs(edgeFlux));
+                if (edgeFlux != 0.0d) {
+                    // Transparency is removed because very small fluxes are almost not visible
+                    // edgeView.setLockedValue(BasicVisualLexicon.EDGE_TRANSPARENCY, (abs(edgeFlux.intValue()) + 2) * 50);
+                    edgeView.setLockedValue(BasicVisualLexicon.EDGE_WIDTH, abs(edgeFlux)+1);
                 } else {edgeView.setLockedValue(BasicVisualLexicon.EDGE_TRANSPARENCY, 0);}
             } else {
                 // Otherwise we just chose the Color based on their direction
