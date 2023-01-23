@@ -35,6 +35,7 @@ public class Aesthetics {
     private void compNodes() {
         // Here we change the appearance of the Compartment Nodes
         ListIterator<String> compListIterator = compList.listIterator();
+        Color[] colors = getColors(compList.size());
         while (compListIterator.hasNext()) {
             String compartment = compListIterator.next();
             int idx = compListIterator.nextIndex();
@@ -43,7 +44,7 @@ public class Aesthetics {
 
             String compNodeName = newNetwork.getDefaultNodeTable().getRow(nodes.getCompNodeFromName(compartment).getSUID()).get("shared name", String.class);
             double compNodeSize = compNodeView.getVisualProperty(BasicVisualLexicon.NODE_SIZE) + 100;
-            Paint compNodeColor = new ColorUIResource((idx*(idx+57))%255, (idx*88)%255, (idx*idx*22)%255);
+            Paint compNodeColor = new ColorUIResource(colors[idx-1]);
 
             compNodeView.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, compNodeColor);
             compNodeView.setLockedValue(BasicVisualLexicon.NODE_SIZE, compNodeSize);
@@ -100,4 +101,15 @@ public class Aesthetics {
             }
         }
     }
+
+    public static Color[] getColors(int n) {
+        Color[] colors = new Color[n];
+        for (int i = 0; i < n; i++) {
+            float hue = (float) i / n;
+            colors[i] = Color.getHSBColor(hue, 1.0f, 1.0f);
+        }
+        return colors;
+    }
+
+
 }
