@@ -35,7 +35,7 @@ public class CyActivator extends AbstractCyActivator {
 
 
 		Properties createNetworkViewTaskFactoryProps = new Properties();
-		createNetworkViewTaskFactoryProps.setProperty("preferredMenu","Apps.Samples");
+		createNetworkViewTaskFactoryProps.setProperty("preferredMenu","Apps.SCyNet");
 
 		// This Part has been changed to make the Menu bigger and add the currently loaded Networks
 		Set<CyNetwork> allNetworks = cyNetworkManagerServiceRef.getNetworkSet();

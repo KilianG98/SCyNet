@@ -56,7 +56,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 			myView = views.iterator().next();
 
 		if (myView == null) {
-			// create a new view for my network
+			// create a new View for my network
 			myView = cnvf.createNetworkView(newNetwork);
 			networkViewManager.addNetworkView(myView);
 		} else {

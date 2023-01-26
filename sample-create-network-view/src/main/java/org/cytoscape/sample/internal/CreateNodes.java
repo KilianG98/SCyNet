@@ -63,7 +63,6 @@ public class CreateNodes {
             }
         }
         // intCompNodeNames.remove("exchg");
-        System.out.println(intCompNodeNames);
         return intCompNodeNames;
     }
 
