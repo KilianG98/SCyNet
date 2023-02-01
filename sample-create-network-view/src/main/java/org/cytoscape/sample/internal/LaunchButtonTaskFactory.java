@@ -19,7 +19,7 @@ public class LaunchButtonTaskFactory extends CyActivator{
     public LaunchButtonTaskFactory(BundleContext bc, CyNetworkNaming cyNetworkNamingServiceRef, CyNetworkFactory cyNetworkFactoryServiceRef, CyNetworkManager cyNetworkManagerServiceRef, CyNetworkViewFactory cyNetworkViewFactoryServiceRef, CyNetworkViewManager cyNetworkViewManagerServiceRef, DataSourceManager dataSourceManager) {
 
         Properties createNetworkViewTaskFactoryProps = new Properties();
-        createNetworkViewTaskFactoryProps.setProperty("preferredMenu", "Apps.SCyNet");
+        createNetworkViewTaskFactoryProps.setProperty("preferredMenu", "Apps.SCyNet.SCyNet");
 
         // This Part has been changed to make the Menu bigger and add the currently loaded Networks
         Set<CyNetwork> allNetworks = cyNetworkManagerServiceRef.getNetworkSet();

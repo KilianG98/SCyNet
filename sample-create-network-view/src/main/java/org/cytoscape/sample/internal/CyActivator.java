@@ -34,22 +34,18 @@ public class CyActivator extends AbstractCyActivator {
 
 		CyNetworkViewFactory cyNetworkViewFactoryServiceRef = getService(bc, CyNetworkViewFactory.class);
 		CyNetworkViewManager cyNetworkViewManagerServiceRef = getService(bc, CyNetworkViewManager.class);
-		// Add a button to launch the application
-		JButton launchButton = new JButton("Launch");
-		launchButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				// Create the properties for the launch button
-				Properties launchButtonProperties = new Properties();
-				launchButtonProperties.setProperty("preferredMenu", "Apps.SCyNet");
-				launchButtonProperties.setProperty("title", "SCyNet");
 
-				// Register the launch button as a TaskFactory service
+		// Create the properties for the launch button
+		Properties launchButtonProperties = new Properties();
+		launchButtonProperties.setProperty("preferredMenu", "Apps.SCyNet");
+		launchButtonProperties.setProperty("title", "SCyNet");
 
-				LaunchButtonTaskFactory launchButtonTaskFactory = new LaunchButtonTaskFactory(bc, cyNetworkNamingServiceRef, cyNetworkFactoryServiceRef, cyNetworkManagerServiceRef, cyNetworkViewFactoryServiceRef, cyNetworkViewManagerServiceRef, dataSourceManager);
-				registerService(bc, launchButtonTaskFactory, TaskFactory.class, launchButtonProperties);
+		// Register the launch button as a TaskFactory service
+
+		LaunchButtonTaskFactory launchButtonTaskFactory = new LaunchButtonTaskFactory(bc, cyNetworkNamingServiceRef, cyNetworkFactoryServiceRef, cyNetworkManagerServiceRef, cyNetworkViewFactoryServiceRef, cyNetworkViewManagerServiceRef, dataSourceManager);
+		registerService(bc, launchButtonTaskFactory, TaskFactory.class, launchButtonProperties);
 			}
-		});
-	}
+
 }
 
 
