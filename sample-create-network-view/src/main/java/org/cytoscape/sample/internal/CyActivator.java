@@ -11,6 +11,9 @@ import org.osgi.framework.BundleContext;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.session.CyNetworkNaming;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Properties;
 import java.util.Set;
 
@@ -20,30 +23,34 @@ public class CyActivator extends AbstractCyActivator {
 		super();
 	}
 
-
 	public void start(BundleContext bc) {
 
 		DataSourceManager dataSourceManager = getService(bc, DataSourceManager.class);
 
-		CyNetworkNaming cyNetworkNamingServiceRef = getService(bc,CyNetworkNaming.class);
+		CyNetworkNaming cyNetworkNamingServiceRef = getService(bc, CyNetworkNaming.class);
 
-		CyNetworkFactory cyNetworkFactoryServiceRef = getService(bc,CyNetworkFactory.class);
-		CyNetworkManager cyNetworkManagerServiceRef = getService(bc,CyNetworkManager.class);
+		CyNetworkFactory cyNetworkFactoryServiceRef = getService(bc, CyNetworkFactory.class);
+		CyNetworkManager cyNetworkManagerServiceRef = getService(bc, CyNetworkManager.class);
 
-		CyNetworkViewFactory cyNetworkViewFactoryServiceRef = getService(bc,CyNetworkViewFactory.class);
-		CyNetworkViewManager cyNetworkViewManagerServiceRef = getService(bc,CyNetworkViewManager.class);
+		CyNetworkViewFactory cyNetworkViewFactoryServiceRef = getService(bc, CyNetworkViewFactory.class);
+		CyNetworkViewManager cyNetworkViewManagerServiceRef = getService(bc, CyNetworkViewManager.class);
+		// Add a button to launch the application
+		JButton launchButton = new JButton("Launch");
+		launchButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				// Create the properties for the launch button
+				Properties launchButtonProperties = new Properties();
+				launchButtonProperties.setProperty("preferredMenu", "Apps.SCyNet");
+				launchButtonProperties.setProperty("title", "SCyNet");
 
+				// Register the launch button as a TaskFactory service
 
-		Properties createNetworkViewTaskFactoryProps = new Properties();
-		createNetworkViewTaskFactoryProps.setProperty("preferredMenu","Apps.SCyNet");
-
-		// This Part has been changed to make the Menu bigger and add the currently loaded Networks
-		Set<CyNetwork> allNetworks = cyNetworkManagerServiceRef.getNetworkSet();
-		for (CyNetwork currentNetwork : allNetworks) {
-			CreateNetworkViewTaskFactory createNetworkViewTaskFactory = new CreateNetworkViewTaskFactory(cyNetworkNamingServiceRef, cyNetworkFactoryServiceRef,cyNetworkManagerServiceRef, cyNetworkViewFactoryServiceRef, cyNetworkViewManagerServiceRef, dataSourceManager, currentNetwork);
-			String currentName = currentNetwork.getDefaultNetworkTable().getRow(currentNetwork.getSUID()).get("name", String.class);
-			createNetworkViewTaskFactoryProps.setProperty("title", currentName);
-			registerService(bc,createNetworkViewTaskFactory,TaskFactory.class, createNetworkViewTaskFactoryProps);
-		}
+				LaunchButtonTaskFactory launchButtonTaskFactory = new LaunchButtonTaskFactory(bc, cyNetworkNamingServiceRef, cyNetworkFactoryServiceRef, cyNetworkManagerServiceRef, cyNetworkViewFactoryServiceRef, cyNetworkViewManagerServiceRef, dataSourceManager);
+				registerService(bc, launchButtonTaskFactory, TaskFactory.class, launchButtonProperties);
+			}
+		});
 	}
 }
+
+
+
