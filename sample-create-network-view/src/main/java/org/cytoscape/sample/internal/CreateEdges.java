@@ -17,6 +17,7 @@ public class CreateEdges {
     private final List<CyNode> oldExternalNodes;
     private final HashMap<String, Double> csvMap;
     private boolean mapAdded = true;
+    private final HashMap<CyNode, Double> nodeFluxes = new HashMap<>();
 
     public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Double> csvMap) {
         this.edgeIDs = new ArrayList<>();
@@ -29,6 +30,7 @@ public class CreateEdges {
         this.oldExternalNodes = createNodes.getExtNodes();
         this.outgoingEdges = mkMapOfOutEdges();
         this.incomingEdges = mkMapOfInEdges();
+        makeFluxMap();
         makeAllEdges();
     }
 
@@ -49,24 +51,18 @@ public class CreateEdges {
         // or compartment Nodes if the Source is in a compartment
 
         for (CyNode oldExchgNode : createNodes.getExchgNodes()) {
-            //I added the exchg Compartemnt Node of the old Network to the list of exchg Nodes, because there are edges going to this Node.
-            // right now it is a different Node than the exchg comp Node in the new network, since they are created in different methods
-            // I refer to them as EXCHG node and EXCHG-COMP node
-            // They should be merged into one Node.
+
             List<CyNode> oldSources = getAllNeighbors(oldExchgNode, "Sources");
 
             for (CyNode oSource : oldSources) {
 
                 if (oldExternalNodes.contains(oSource)) {
-                    // this happens for the EXCHG node ALL the exchg metabolites are imported to the compartment.
-                    // leads to BLACK edges to the EXCHG node
+
+
                     CyEdge edge = makeEdge(createNodes.getNewNode(oSource), createNodes.getNewNode(oldExchgNode));
                     edgeTributes(edge, oSource, oldExchgNode);
                 } else {
-                    //all the metabolites are here
-                    //their sources are Transport reactions, coming from the organism(BLUE edges from organisms to Metabolites)
-                    //But also TP reactions from the exchg comp, those are import reactions from outside the model.
-                    //Therefore there are GREEN edges beetween all metabolites and the EXCHG-COMP node
+
                     CyNode comp = createNodes.getIntCompNodeForAnyNode(oSource);
                     CyEdge edge = makeEdge(comp, createNodes.getNewNode(oldExchgNode));
                     edgeTributesComp(edge, oSource, oldExchgNode, true);
@@ -82,15 +78,11 @@ public class CreateEdges {
                 List<CyNode> oldTargets = getAllNeighbors(oldExchgNode, "Targets");
                 for (CyNode oTarget : oldTargets) {
 
-                    // System.out.println(oTarget);//this is always 1532516 in the old networK->  EXCHG Node of the old Network
                     CyNode comp = createNodes.getIntCompNodeForAnyNode(oTarget);
-                    //Compartment Nodes have no SBML ID, therefore EXCHG-COMP is returned by default
-                    // -> BLUE Edges betweeen exchg Comp Node and metabolites
+
                     CyEdge edge = makeEdge(createNodes.getNewNode(oldExchgNode), comp);
                     edgeTributesComp(edge, oldExchgNode, oTarget, false);
-                    //There dont appear to be edges going from The EXCHG node to anywhere(which was the reason to add it in the first place)
-                    //There are also no edges going from the exchg-metabolites to anywhere but the EXCHG-Comp Node
-                    //There dont seem to be import reactions in either network.
+
 
                 }
             }
@@ -179,6 +171,9 @@ public class CreateEdges {
                 String sharedName = oldNetwork.getDefaultNodeTable().getRow(oldSource.getSUID()).get("shared name", String.class);
                 String fluxKey = getFluxKey(oldSource);
                 Double fluxValue = getFlux(fluxKey);
+                if(mapAdded) {
+                    setFlux(oldTarget, fluxValue);
+                }
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
@@ -191,6 +186,9 @@ public class CreateEdges {
                 String sharedName = sourceName.concat(" - Import");
                 String fluxKey = getFluxKey(oldTarget);
                 Double fluxValue = getFlux(fluxKey);
+                if(mapAdded) {
+                    setFlux(oldSource, fluxValue);
+                }
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
                 newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("shared name", sharedName);
@@ -209,8 +207,23 @@ public class CreateEdges {
             }
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("stoichiometry", stoichiometry);
         }
-
+        private void makeFluxMap(){
+            // create a hashmap to determine whether the nodes in the new network  have flux or not, set to 0 as default
+            for (CyNode exchgNode: createNodes.getExchgNodes()){
+                CyNode newExchgNode = createNodes.getNewNode(exchgNode);
+                nodeFluxes.putIfAbsent(newExchgNode, 0.0d);
+            }
+        }
+        private void setFlux(CyNode oldNode, Double fluxValue){
+            CyNode newNode = createNodes.getNewNode(oldNode);
+            if (!fluxValue.equals(0.0)){
+                Double newFlux = nodeFluxes.get(newNode) + Math.abs(fluxValue);
+                nodeFluxes.put(newNode,newFlux);
+            }
+        }
         private String getFluxKey(CyNode oldNode){
+
+            //why do we use sbml type AND ID?
             String oldType = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("sbml type", String.class);
             String oldID = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("sbml id", String.class);
             String[] splitID = oldID.split("_", 0);
@@ -235,6 +248,9 @@ public class CreateEdges {
             } else {
                 return csvMap.get(key);
             }
+        }
+        public HashMap<CyNode, Double> getFLuxMap(){
+            return nodeFluxes;
         }
     }
 
