@@ -33,6 +33,7 @@ public class CreateNodes {
     // Private Methods
     private Set<String> createComps() {
         // These are all compartments (external + internal) without the exchange compartment, which is added in the end
+        // [exchg, ac0, ae0, ...]
         Set<String> comps = new HashSet<>();
 
         List<CyNode> allNodes = oldNetwork.getNodeList();
@@ -56,6 +57,7 @@ public class CreateNodes {
 
     private List<String> createIntComps() {
         // makes a list of all internal compartments by removing the external ones from all compartments
+        // [exchg, ac0, ...]
         List<String> intCompNodeNames = new ArrayList<>();
         for (String compartment : allCompartments) {
             if (compartment.charAt(compartment.length() - 2) != 'e') {
@@ -68,13 +70,17 @@ public class CreateNodes {
 
     private void createExtNodes() {
         // here a list of external Nodes is created by looping through all Nodes and only adding one Node of a certain type (shared name)
+        // we also create a dictionary connecting the name to all its ancestors
+        // for every differing 'shared name' a node is defined
         List<CyNode> allNodes = oldNetwork.getNodeList();
         List<String> externalNodeNames = new ArrayList<>();
 
         for (CyNode currentNode : allNodes) {
             String currentComp = getCompOfMetaboliteNode(currentNode);
             if (currentComp.charAt(currentComp.length() - 2) == 'e' || currentComp.equals("exchg")) {
-                String currentName = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("shared name", String.class);
+                //String currentName = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("shared name", String.class);
+                String currentName = getIdentityM(currentNode);
+                // This gets an ID which is equal for equal 'shared name'. Which is accessed by sbml id 'M' + 'cpd00000'
                 if (!externalNodeNames.contains(currentName)) {
                     extNodes.add(currentNode);
                     externalNodeNames.add(currentName);
@@ -90,34 +96,39 @@ public class CreateNodes {
     }
 
     private void createExchgNodes() {
+        // here a list of nodes in the exchg-compartment is made
         List<CyNode> allNodes = oldNetwork.getNodeList();
         List<CyNode> exchangeNode = new ArrayList<>();
 
         for (CyNode currentNode : allNodes) {
-            String currentComp = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml compartment", String.class);
-            // String currentID = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml id", String.class);
-                if (Objects.equals(currentComp, "exchg")) {
-                    exchangeNode.add(currentNode);
-                }
+            // from ID we can get 'M' + 'exchg'
+            String[] idParts = oldNetwork.getDefaultNodeTable().getRow(currentNode.getSUID()).get("sbml id", String.class).split("_");
+            if (idParts.length == 3 && Objects.equals(idParts[2], "exchg")) {exchangeNode.add(currentNode);}
         }
         this.exchgNodes = exchangeNode;
     }
 
-    private void addExtNodesToNewNetwork(List<CyNode> externalNodes) {
+    private void addExtNodesToNewNetwork(List<CyNode> exchgNodes) {
         // here the external Nodes are added to the new Network and HashMaps mapping old to new Nodes is created simultaneously
         HashMap<CyNode, CyNode> oldNewTranslation = new HashMap<>();
         HashMap<CyNode, List<CyNode>> newOldTranslation = new HashMap<>();
         HashMap<String, CyNode> alreadyPlaced = new HashMap<>();
 
-        for (CyNode oldNode : externalNodes) {
-            String nodeSharedName = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("shared name", String.class);
+        for (CyNode oldNode : exchgNodes) {
+            // This gets an ID which is equal for equal 'shared name'. Which is accessed by sbml id 'M' + 'cpd00000'
+            String nodeName = getIdentityM(oldNode);
             CyNode newNode;
-            if (!alreadyPlaced.containsKey(nodeSharedName)) {
+            System.out.println(nodeName);
+            if (!alreadyPlaced.containsKey(nodeName)) {
+                System.out.println(nodeName);
                 newNode = newNetwork.addNode();
-                alreadyPlaced.put(nodeSharedName, newNode);
+                alreadyPlaced.put(nodeName, newNode);
+                newNetwork.getDefaultNodeTable().getRow(newNode.getSUID()).set("name", nodeName);
+                // Here we get the "shared name" of the first metabolite Node with a certain 'cdd00000'-id
+                String nodeSharedName = oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("shared name", String.class);
                 newNetwork.getDefaultNodeTable().getRow(newNode.getSUID()).set("shared name", nodeSharedName);
             } else {
-                newNode = alreadyPlaced.get(nodeSharedName);
+                newNode = alreadyPlaced.get(nodeName);
             }
             oldNewTranslation.put(oldNode, newNode);
             newOldTranslation.put(newNode, Arrays.asList(oldNode));
@@ -187,6 +198,18 @@ public class CreateNodes {
             return getCompOfSBML(currentId);
         }
         return "unknown";
+    }
+
+    private String getIdentityM(CyNode node) {
+        String[] idParts = oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class).split("_");
+        if (idParts[0].equals("M")) {
+            if (idParts.length == 3) {
+                return idParts[1];
+            } else {
+                return idParts[2];
+            }
+        }
+        return "ERROR";
     }
 
     // Public Methods [sorted by output]
