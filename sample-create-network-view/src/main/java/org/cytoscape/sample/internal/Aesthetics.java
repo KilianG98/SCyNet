@@ -53,10 +53,11 @@ public class Aesthetics {
             String compNodeName = newNetwork.getDefaultNodeTable().getRow(nodes.getCompNodeFromName(compartment).getSUID()).get("shared name", String.class);
             double compNodeSize = compNodeView.getVisualProperty(BasicVisualLexicon.NODE_SIZE) + 100;
             Paint compNodeColor = new ColorUIResource(equidistantColors[idx - 1]);
-
+            Integer size = 25;
             compNodeView.setLockedValue(BasicVisualLexicon.NODE_FILL_COLOR, compNodeColor);
             compNodeView.setLockedValue(BasicVisualLexicon.NODE_SIZE, compNodeSize);
             compNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL, compNodeName);
+            compNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL_FONT_SIZE, size);
         }
     }
 
@@ -70,9 +71,6 @@ public class Aesthetics {
                 continue;
             }
             String exchgNodeName = newNetwork.getDefaultNodeTable().getRow(nodes.getNewNode(exchgNode).getSUID()).get("shared name", String.class);
-            Integer size = exchgNodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_FONT_SIZE);
-
-            exchgNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL_FONT_SIZE, size / 2);
             exchgNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL, exchgNodeName);
             if (!csvMap.isEmpty() && fluxMap.get(newNode).equals(0.0d)){
                 newNetwork.removeNodes(Collections.singletonList(newNode));
@@ -98,10 +96,8 @@ public class Aesthetics {
                 }
                 edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
 
-                // Transparency and Width of the Edges is also based on Fluxes
+                // Width of the Edges is also based on Fluxes
                 if (edgeFlux != 0.0d) {
-                    // Transparency is removed because very small fluxes are almost not visible
-                    // edgeView.setLockedValue(BasicVisualLexicon.EDGE_TRANSPARENCY, (abs(edgeFlux.intValue()) + 2) * 50);
                     edgeView.setLockedValue(BasicVisualLexicon.EDGE_WIDTH, abs(edgeFlux) + 1);
                 } else {
                     edgeView.setLockedValue(BasicVisualLexicon.EDGE_TRANSPARENCY, 0);
@@ -121,7 +117,7 @@ public class Aesthetics {
     }
 
     private void removeNodes() {
-        // Here we change the appearance of the external Nodes if the have no 'crossfeeding'
+        // Here we change the appearance of the external Nodes if they have no 'crossfeeding'
         List<CyNode> extNodesList = nodes.getExchgNodes();
         for (CyNode exchgNode : extNodesList) {
             CyNode newNode = nodes.getNewNode(exchgNode);
@@ -143,6 +139,9 @@ public class Aesthetics {
             if (!(positive && negative)) {
                 newNetwork.removeNodes(Collections.singletonList(newNode));
                 // newView.getNodeView(newNode).setVisualProperty(BasicVisualLexicon.NODE_TRANSPARENCY, 0);
+            } else {
+                Integer size = 12;
+                newView.getNodeView(newNode).setLockedValue(BasicVisualLexicon.NODE_LABEL_FONT_SIZE, size);
             }
         }
     }
