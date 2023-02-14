@@ -118,9 +118,7 @@ public class CreateNodes {
             // This gets an ID which is equal for equal 'shared name'. Which is accessed by sbml id 'M' + 'cpd00000'
             String nodeName = getIdentityM(oldNode);
             CyNode newNode;
-            System.out.println(nodeName);
             if (!alreadyPlaced.containsKey(nodeName)) {
-                System.out.println(nodeName);
                 newNode = newNetwork.addNode();
                 alreadyPlaced.put(nodeName, newNode);
                 newNetwork.getDefaultNodeTable().getRow(newNode.getSUID()).set("name", nodeName);

@@ -24,10 +24,11 @@ public class CreateNetworkViewTask extends AbstractTask {
 	private final DataSourceManager dataSourceManager;
 	private final CyNetwork currentNetwork;
 	private final HashMap<String, Double> csvMap;
+	private boolean showOnlyCrossfeeding;
 
 	public CreateNetworkViewTask(CyNetworkNaming cyNetworkNaming, CyNetworkFactory cnf, CyNetworkManager networkManager,
 								 CyNetworkViewFactory cnvf, final CyNetworkViewManager networkViewManager,
-								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Double> csvMap) {
+								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Double> csvMap, boolean showOnlyCrossfeeding) {
 		this.cnf = cnf;
 		this.cnvf = cnvf;
 		this.networkViewManager = networkViewManager;
@@ -36,6 +37,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 		this.dataSourceManager = dataSourceManager;
 		this.currentNetwork = currentNetwork;
 		this.csvMap = csvMap;
+		this.showOnlyCrossfeeding = showOnlyCrossfeeding;
 	}
 
 	public void run(TaskMonitor monitor) throws FileNotFoundException {
@@ -63,6 +65,6 @@ public class CreateNetworkViewTask extends AbstractTask {
 			System.out.println("This Network View already existed.");
 		}
 		// Here the color/size/label etc. of the Nodes and Edges is changed
-		Aesthetics aesthetics = new Aesthetics(createNodes, createEdges.getFLuxMap(), newNetwork, myView);
+		Aesthetics aesthetics = new Aesthetics(createNodes, createEdges.getFLuxMap(), newNetwork, myView, showOnlyCrossfeeding);
 	}
 }

@@ -22,7 +22,7 @@ public class Aesthetics {
     private final CyNetworkView newView;
     private final List<String> compList;
     private HashMap<CyNode, Double> fluxMap;
-    public Aesthetics(CreateNodes nodes, HashMap<CyNode, Double> fluxMap, CyNetwork newNetwork, CyNetworkView newView) {
+    public Aesthetics(CreateNodes nodes, HashMap<CyNode, Double> fluxMap, CyNetwork newNetwork, CyNetworkView newView, boolean showOnlyCrossfeeding) {
         this.nodes = nodes;
         this.newNetwork = newNetwork;
         this.newView = newView;
@@ -32,6 +32,9 @@ public class Aesthetics {
         exchgNodes();
         edges();
         newView.updateView();
+        if (showOnlyCrossfeeding) {
+            removeNodes();
+        }
     }
 
     private void compNodes() {
@@ -111,6 +114,32 @@ public class Aesthetics {
                     Paint edgeColor = new ColorUIResource(Color.green);
                     edgeView.setLockedValue(BasicVisualLexicon.EDGE_PAINT, edgeColor);
                 }
+            }
+        }
+    }
+
+    private void removeNodes() {
+        // Here we change the appearance of the external Nodes if the have no 'crossfeeding'
+        List<CyNode> extNodesList = nodes.getExchgNodes();
+        for (CyNode exchgNode : extNodesList) {
+            CyNode newNode = nodes.getNewNode(exchgNode);
+            List<CyEdge> allEdges = newNetwork.getAdjacentEdgeList(newNode, CyEdge.Type.ANY);
+            boolean positive = false;
+            boolean negative = false;
+            for (CyEdge currentEdge : allEdges) {
+                Double currentFlux = newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).get("flux", Double.class);
+                if (currentFlux == null) {
+                    continue;
+                }
+                if (currentFlux < 0) {
+                    negative = true;
+                }
+                if (currentFlux > 0) {
+                    positive = true;
+                }
+            }
+            if (!(positive && negative)) {
+                newView.getNodeView(newNode).setVisualProperty(BasicVisualLexicon.NODE_TRANSPARENCY, 0);
             }
         }
     }
