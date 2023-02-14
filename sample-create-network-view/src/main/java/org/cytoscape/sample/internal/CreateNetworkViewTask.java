@@ -65,6 +65,6 @@ public class CreateNetworkViewTask extends AbstractTask {
 			System.out.println("This Network View already existed.");
 		}
 		// Here the color/size/label etc. of the Nodes and Edges is changed
-		Aesthetics aesthetics = new Aesthetics(createNodes, createEdges.getFLuxMap(), newNetwork, myView, showOnlyCrossfeeding);
+		Aesthetics aesthetics = new Aesthetics(createNodes, createEdges.getFLuxMap(), newNetwork, myView, showOnlyCrossfeeding, csvMap);
 	}
 }

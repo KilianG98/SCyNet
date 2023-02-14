@@ -46,15 +46,8 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JToggleButton toggleButton = (JToggleButton) e.getSource();
-				if (toggleButton.isSelected()) {
-					// Handle the "selected" outcome
-					// System.out.println("Button is selected");
-					showOnlyCrossfeeding = true;
-				} else {
-					// Handle the "not selected" outcome
-					// System.out.println("Button is not selected");
-					showOnlyCrossfeeding = false;
-				}
+				// Handle the "selected" and "not selected" outcome
+				showOnlyCrossfeeding = toggleButton.isSelected();
 			}
 		};
 		this.myButton.addActionListener(listener);

@@ -9,9 +9,8 @@ import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.ListIterator;
 
 import static java.lang.Math.abs;
 
@@ -22,12 +21,14 @@ public class Aesthetics {
     private final CyNetworkView newView;
     private final List<String> compList;
     private HashMap<CyNode, Double> fluxMap;
-    public Aesthetics(CreateNodes nodes, HashMap<CyNode, Double> fluxMap, CyNetwork newNetwork, CyNetworkView newView, boolean showOnlyCrossfeeding) {
+    private HashMap<String, Double> csvMap;
+    public Aesthetics(CreateNodes nodes, HashMap<CyNode, Double> fluxMap, CyNetwork newNetwork, CyNetworkView newView, boolean showOnlyCrossfeeding, HashMap<String, Double> csvMap) {
         this.nodes = nodes;
         this.newNetwork = newNetwork;
         this.newView = newView;
         this.compList = nodes.getIntComps();
         this.fluxMap = fluxMap;
+        this.csvMap = csvMap;
         compNodes();
         exchgNodes();
         edges();
@@ -73,8 +74,9 @@ public class Aesthetics {
 
             exchgNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL_FONT_SIZE, size / 2);
             exchgNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL, exchgNodeName);
-            if (fluxMap.get(newNode).equals(0.0d)){
-                exchgNodeView.setVisualProperty(BasicVisualLexicon.NODE_TRANSPARENCY, 0);
+            if (!csvMap.isEmpty() && fluxMap.get(newNode).equals(0.0d)){
+                newNetwork.removeNodes(Collections.singletonList(newNode));
+                // exchgNodeView.setVisualProperty(BasicVisualLexicon.NODE_TRANSPARENCY, 0);
             }
         }
     }
@@ -139,7 +141,8 @@ public class Aesthetics {
                 }
             }
             if (!(positive && negative)) {
-                newView.getNodeView(newNode).setVisualProperty(BasicVisualLexicon.NODE_TRANSPARENCY, 0);
+                newNetwork.removeNodes(Collections.singletonList(newNode));
+                // newView.getNodeView(newNode).setVisualProperty(BasicVisualLexicon.NODE_TRANSPARENCY, 0);
             }
         }
     }
