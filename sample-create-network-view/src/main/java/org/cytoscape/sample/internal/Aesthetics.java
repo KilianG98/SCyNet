@@ -13,7 +13,13 @@ import java.util.*;
 import java.util.List;
 
 import static java.lang.Math.abs;
-
+/**
+* The Aesthetics class defines methods to modify the visual appearance of a Cytoscape network based on certain criteria.
+*
+* This class takes a CreateNodes object, which is used to access information about the network's nodes, and a HashMap
+* of flux values for each node. It also takes the network and network view to be modified, a boolean flag indicating whether
+* only crossfeeding nodes should be displayed, and a HashMap of CSV values for each node.
+*/
 public class Aesthetics {
 
     private final CreateNodes nodes;
@@ -22,6 +28,17 @@ public class Aesthetics {
     private final List<String> compList;
     private HashMap<CyNode, Double> fluxMap;
     private HashMap<String, Double> csvMap;
+    /**
+     * Constructs an Aesthetics object using the specified parameters.
+     *
+     * @param nodes             the CreateNodes object used to access information about the network's nodes
+     * @param fluxMap           a HashMap of flux values for each node in the network
+     * @param newNetwork        the CyNetwork object to be modified
+     * @param newView           the CyNetworkView object to be modified
+     * @param showOnlyCrossfeeding  a boolean flag indicating whether only crossfeeding nodes should be displayed
+     * @param csvMap            a HashMap of CSV values for each node in the network
+     */
+
     public Aesthetics(CreateNodes nodes, HashMap<CyNode, Double> fluxMap, CyNetwork newNetwork, CyNetworkView newView, boolean showOnlyCrossfeeding, HashMap<String, Double> csvMap) {
         this.nodes = nodes;
         this.newNetwork = newNetwork;
@@ -34,10 +51,12 @@ public class Aesthetics {
         edges();
         newView.updateView();
         if (showOnlyCrossfeeding) {
-            removeNodes();
+            removeNonCFNodes();
         }
     }
-
+    /**
+     * Modifies the appearance of the compartment nodes in the network view.
+     */
     private void compNodes() {
         // Here we change the appearance of the Compartment Nodes
         ListIterator<String> compListIterator = compList.listIterator();
@@ -60,7 +79,9 @@ public class Aesthetics {
             compNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL_FONT_SIZE, size);
         }
     }
-
+    /**
+     * Modifies the appearance of the external nodes in the network view and removes nodes with no flux.
+     */
     private void exchgNodes() {
         // Here we change the appearance of the external Nodes
         List<CyNode> extNodesList = nodes.getExchgNodes();
@@ -78,6 +99,9 @@ public class Aesthetics {
             }
         }
     }
+    /**
+     * Modifies the appearance of the edges in the network view.
+     */
     private void edges () {
         // Here we change the appearance of the Edges
         for (CyEdge newEdge : newNetwork.getEdgeList()) {
@@ -116,15 +140,18 @@ public class Aesthetics {
         }
     }
 
-    private void removeNodes() {
-        // Here we change the appearance of the external Nodes if they have no 'crossfeeding'
+    /**
+     * Identifies and removes all nodes that do not have crossfeeding.
+     */
+    private void removeNonCFNodes() {
+
         List<CyNode> extNodesList = nodes.getExchgNodes();
         for (CyNode exchgNode : extNodesList) {
             CyNode newNode = nodes.getNewNode(exchgNode);
-            List<CyEdge> allEdges = newNetwork.getAdjacentEdgeList(newNode, CyEdge.Type.ANY);
+            List<CyEdge> adjacentEdgeList = newNetwork.getAdjacentEdgeList(newNode, CyEdge.Type.ANY);
             boolean positive = false;
             boolean negative = false;
-            for (CyEdge currentEdge : allEdges) {
+            for (CyEdge currentEdge : adjacentEdgeList) {
                 Double currentFlux = newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).get("flux", Double.class);
                 if (currentFlux == null) {
                     continue;
@@ -145,7 +172,9 @@ public class Aesthetics {
             }
         }
     }
-
+    /**
+     * Calculates equidistant colors for the given number of compartment nodes in the network.
+     */
     public static Color[] getEquidistantColors(int n) {
         Color[] colors = new Color[n];
         for (int i = 0; i < n; i++) {
