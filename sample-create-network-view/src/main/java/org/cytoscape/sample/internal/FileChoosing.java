@@ -11,6 +11,9 @@ import java.util.Objects;
 public class FileChoosing {
     private File chosenFile;
 
+    /**
+     * Opens up a window to let the user select a csv file with fluxes.
+     */
     public FileChoosing()
     {
         // Here we use the JFileChooser to open a window where the user can select a CSV-file with the fluxes
@@ -25,6 +28,10 @@ public class FileChoosing {
         }
     }
 
+    /**
+     * Makes a hashmap which maps the fluxes to the correct reactions in the network.
+     * @return the flux map or empty map if the user did not upload a file.
+     */
     public HashMap<String, Double> makeMap() {
         HashMap<String, Double> csvMap = new HashMap<>();
         if (chosenFile == null) {
