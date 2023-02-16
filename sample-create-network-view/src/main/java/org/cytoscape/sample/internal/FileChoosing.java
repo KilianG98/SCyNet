@@ -8,9 +8,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * A class used to select a file which is used to create a HashMap, which maps all reactions/edges to a Flux.
+ */
 public class FileChoosing {
+
+    /**
+     * The chosen file (should be csv-format)
+     */
     private File chosenFile;
 
+    /**
+     * This opens a JFileChooser where a CSV-file can be selected.
+     */
     public FileChoosing()
     {
         // Here we use the JFileChooser to open a window where the user can select a CSV-file with the fluxes
@@ -25,6 +35,10 @@ public class FileChoosing {
         }
     }
 
+    /**
+     * Using the previously added CSV-file a HashMap is created, which maps all the reactions/edges to a certain Flux.
+     * @return The Hashmap mapping all edges to a Flux. If no file was added an empty HashMap is returned.
+     */
     public HashMap<String, Double> makeMap() {
         HashMap<String, Double> csvMap = new HashMap<>();
         if (chosenFile == null) {

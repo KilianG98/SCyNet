@@ -5,20 +5,64 @@ import org.cytoscape.model.CyNode;
 
 import java.util.*;
 
+/**
+ * This class is used to fill the new simpler network with nodes from the old network. The nodes from the exchange-compartment
+ * and the nodes for each of the compartments including the exchange compartment are added.
+ */
 public class CreateNodes {
 
+    /**
+     * the old original network
+     */
     final private CyNetwork oldNetwork;
+    /**
+     * the newly created simpler network
+     */
     private final CyNetwork newNetwork;
+    /**
+     * Translation from old to new nodes
+     */
     private HashMap<CyNode, CyNode> oldToNewNodes;
+    /**
+     * Translation from new to old nodes
+     */
     private HashMap<CyNode, List<CyNode>> newToOldNodes;
+    /**
+     * Translation from compartment name to CyNode
+     */
     private HashMap<String, CyNode> compNameToCompNode;
+    /**
+     * Translation from a compartment CyNode to its name
+     */
     private HashMap<CyNode, String> compNodeToCompName;
+    /**
+     * Translation from external node names to a List of CyNodes
+     */
     private final HashMap<String, List<CyNode>> extNamesToNodes = new HashMap<>();
+    /**
+     * Set of all compartments
+     */
     final private Set<String> allCompartments;
+    /**
+     * List of all internal compartments
+     */
     final private List<String> internalCompartments;
+    /**
+     * List of all external nodes
+     */
     private final List<CyNode> extNodes = new ArrayList<>();
+    /**
+     * List of all exchange nodes
+     */
     private List<CyNode> exchgNodes = new ArrayList<>();
+
     // Constructor
+
+    /**
+     * Fills the newNetwork with the exchange-Nodes from the oldNetwork, as well as the corresponding compartment-Nodes
+     * @param oldNetwork is the network we want to 'simplify'
+     * @param newNetwork is the newly created empty network, which will be filled with nodes
+     */
     public CreateNodes(CyNetwork oldNetwork, CyNetwork newNetwork) {
         this.oldNetwork = oldNetwork;
         this.newNetwork = newNetwork;
@@ -34,7 +78,6 @@ public class CreateNodes {
 
     /**
      * Creates a Set of compartments from a given network, excluding the exchange compartment which is added in the end.
-     *
      * @return A Set of compartment names (as Strings) excluding the exchange compartment.
      */
     private Set<String> createComps() {
@@ -63,7 +106,6 @@ public class CreateNodes {
 
     /**
      * Creates a list of all internal compartments by removing the external ones from a given list of compartments.
-     *
      * @return A List of compartment names (as Strings) with the suffix "_e" removed.
      */
     private List<String> createIntComps() {
@@ -80,7 +122,7 @@ public class CreateNodes {
     }
 
     /**
-     * Creates a list of external Nodes from a given network, where external nodes are defined as those associated with compartments with a suffix of "_e" or "exchg".
+     * Creates a list of external Nodes from a given network, where external nodes are defined as those associated with compartments with a suffix of "e**" (external) or "exchg" (exchange).
      * For every differing 'shared name' a node is defined, and a dictionary connecting the name to all its ancestors is created.
      */
     private void createExtNodes() {
@@ -128,7 +170,6 @@ public class CreateNodes {
 
     /**
      * Adds external nodes to the new network and creates hash maps mapping old to new nodes.
-     *
      * @param exchgNodes a list of external nodes to add to the new network
      */
     private void addExtNodesToNewNetwork(List<CyNode> exchgNodes) {
@@ -157,6 +198,10 @@ public class CreateNodes {
         this.newToOldNodes = newOldTranslation; // store the new-to-old mapping in the class variable
     }
 
+    /**
+     * Adds all the compartment nodes to the new network
+     * @param compList is a List of all the compartment names
+     */
     private void addCompNodesToNewNetwork(List<String> compList) {
         // here the compartment Nodes are added to the new Network and HashMaps mapping old to new Nodes is created simultaneously
         HashMap<String, CyNode> compNameTranslation = new HashMap<>();
@@ -172,6 +217,11 @@ public class CreateNodes {
         this.compNodeToCompName = compNodeTranslation;
     }
 
+    /**
+     * Get-fucntion
+     * @param node any node from the old network
+     * @return its compartment only if it is a metabolite, else returns 'unknown'
+     */
     private String getCompOfMetaboliteNode(CyNode node) {
         // here we return the compartment of a Node only if it is a Metabolite
         if (oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class) != null) {
@@ -184,6 +234,11 @@ public class CreateNodes {
         return "unknown";
     }
 
+    /**
+     * Get-function
+     * @param sbmlId the 'sbml id' value of a certain node
+     * @return translates the ID into the name of the corresponding compartment (String)
+     */
     private String getCompOfSBML(String sbmlId) {
         // this method is used to translate every sbmlId-string into the corresponding compartment
         String ending = sbmlId.substring(Math.max(sbmlId.length() - 2, 0));
@@ -211,6 +266,11 @@ public class CreateNodes {
         return "exchg";
     }
 
+    /**
+     * Get-function
+     * @param node any node from the old network
+     * @return its corresponding compartment if it has one, else 'unknown'
+     */
     private String getCompOfNode(CyNode node) {
         // here the compartment of a Node is calculated using its sbmlId
         if (oldNetwork.getDefaultNodeTable().getRow(node.getSUID()).get("sbml id", String.class) != null) {
@@ -240,6 +300,11 @@ public class CreateNodes {
 
     // Public Methods [sorted by output]
 
+    /**
+     * Get-function
+     * @param node any node from the old network
+     * @return its corresponding internal compartment
+     */
     public CyNode getIntCompNodeForAnyNode(CyNode node){
         // here the internal compartment corresponding to a Node is returned, regardless where the Node is placed
         String compartment = getCompOfNode(node);
@@ -252,42 +317,88 @@ public class CreateNodes {
         }
     }
 
+    /**
+     * Get-function translation
+     * @param oldNode the CyNode in the old network
+     * @return the CyNode in the new network
+     */
     public CyNode getNewNode(CyNode oldNode) {
         return oldToNewNodes.get(oldNode);
     }
 
+    /**
+     * Get-function translation
+     * @param newNode the CyNode in the new network
+     * @return the CyNode in the old network
+     */
     public List<CyNode> getOldNode(CyNode newNode) {
         return newToOldNodes.get(newNode);
     }
 
+    /**
+     * Get-function
+     * @param compName the name of a compartment node in the new network
+     * @return its CyNode class object
+     */
     public CyNode getCompNodeFromName(String compName) {
         return compNameToCompNode.get(compName);
     }
 
+    /**
+     * Get-function
+     * @return all external nodes
+     */
     public List<CyNode> getExtNodes() {
         return extNodes;
     }
 
+    /**
+     * Get-function
+     * @return all exchange nodes
+     */
     public List<CyNode> getExchgNodes() {
         return exchgNodes;
     }
 
+    /**
+     * Get-function translation
+     * @param nodeName the external nodes name
+     * @return the CyNode class object of it
+     */
     public List<CyNode> getExtNodesFromName(String nodeName) {
         return extNamesToNodes.get(nodeName);
     }
 
+    /**
+     * Get-function translation
+     * @param compNode the compartments node in the new network
+     * @return its nama as a String
+     */
     public String getCompNameFromNode(CyNode compNode) {
         return compNodeToCompName.get(compNode);
     }
 
+    /**
+     * Get-function
+     * @param oldNode is node from the old network
+     * @return the shared name listed in the NodeTable
+     */
     public String getNodeSharedName(CyNode oldNode) {
         return oldNetwork.getDefaultNodeTable().getRow(oldNode.getSUID()).get("shared name", String.class);
     }
 
+    /**
+     * Get-function
+     * @return all compartments
+     */
     public Set<String> getAllComps() {
         return allCompartments;
     }
 
+    /**
+     * Get-function
+     * @return all internal compartments
+     */
     public List<String> getIntComps(){
         return internalCompartments;
     }

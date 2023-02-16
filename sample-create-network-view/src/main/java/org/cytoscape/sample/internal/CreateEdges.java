@@ -6,19 +6,64 @@ import org.cytoscape.model.CyNode;
 
 import java.util.*;
 
+/**
+ * This class is used to fill the new network, consisting of only nodes (extracted from the old network), with edges. The edges
+ * are added to the corresponding nodes and then their attributes are filled into the EdgeTable.
+ */
 public class CreateEdges {
+
+    /**
+     * All nodes from the old network
+     */
     private final List<CyNode> cyNodeList;
+    /**
+     * The old network
+     */
     private final CyNetwork oldNetwork;
+    /**
+     * The new network
+     */
     private final CyNetwork newNetwork;
+    /**
+     * The CreateNodes object created earlier
+     */
     private final CreateNodes createNodes;
+    /**
+     * Map of each CyNode from the old network to its outgoing edges
+     */
     private final HashMap<CyNode, List<CyEdge>> outgoingEdges;
+    /**
+     * Map of each CyNode from the old network to its incoming edges
+     */
     private final HashMap<CyNode, List<CyEdge>> incomingEdges;
+    /**
+     * List of ID's created for each to avoid dubblicates
+     */
     private final List<String> edgeIDs;
+    /**
+     * List of the old external nodes
+     */
     private final List<CyNode> oldExternalNodes;
+    /**
+     * CSV-map created from the CSV-file if it was added
+     */
     private final HashMap<String, Double> csvMap;
+    /**
+     * boolean saying if the map was added
+     */
     private boolean mapAdded = true;
+    /**
+     * Flux-Map translated from the CSV-Map
+     */
     private final HashMap<CyNode, Double> nodeFluxes = new HashMap<>();
 
+    /**
+     * Adds all the corresponding edges and their attributes to a network consisting of only nodes from an oldNetwork.
+     * @param oldNetwork is the original network from which the simple network is created
+     * @param newNetwork is the new network, which at this point consists only of nodes
+     * @param createNodes is the CreateNodes object created earlier holding all the translations
+     * @param csvMap is the map with the flux-values, if one was loaded in
+     */
     public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Double> csvMap) {
         this.edgeIDs = new ArrayList<>();
         if (csvMap.isEmpty()) {this.mapAdded = false;}
@@ -34,6 +79,11 @@ public class CreateEdges {
         makeAllEdges();
     }
 
+
+    /**
+     * With the method the columns of the new EdgeTable are created, then all edges are created and their attributes
+     * are added into the table.
+     */
     private void makeAllEdges() {
         // here we add the columns needed in the edge-table and then we create all the edges
         newNetwork.getDefaultEdgeTable().createColumn("source", String.class, true);
@@ -77,8 +127,8 @@ public class CreateEdges {
     }
 
     /**
-     * Loops through all external Nodes and gets their Targets, using these we make edges from the external Nodes or
-     * compartment Nodes if the Target is in a compartment.
+     * Loops through all external Nodes and gets their targets, using these we make edges from the external Nodes or
+     * compartment Nodes if the target is in a compartment.
      */
     private void makeEdgesFromNode () {
         // here we loop through all external Nodes and get their Targets, using these we make edges the external Nodes
@@ -319,6 +369,10 @@ public class CreateEdges {
         }
     }
 
+    /**
+     * Get-function for the Flux-Map created
+     * @return the Flux-Map
+     */
     public HashMap<CyNode, Double> getFLuxMap(){
         return nodeFluxes;
     }

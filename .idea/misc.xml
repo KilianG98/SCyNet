@@ -3,6 +3,10 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="Osmorc" url="file://$PROJECT_DIR$/sample-create-network-view" />
   </component>
+  <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Desktop/DevDocs" />
+    <option name="OPTION_SCOPE" value="private" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>

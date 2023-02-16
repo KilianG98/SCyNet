@@ -13,19 +13,60 @@ import org.cytoscape.work.TaskMonitor;
 import java.io.*;
 import java.util.*;
 
-
+/**
+ * A task-class which executes all the needed steps to create a new network-view.
+ */
 public class CreateNetworkViewTask extends AbstractTask {
 
+	/**
+	 * The factory for creating networks
+	 */
 	private final CyNetworkFactory cnf;
+	/**
+	 * The factory for creating network views
+	 */
 	private final CyNetworkViewFactory cnvf;
+	/**
+	 * The manager for network views in Cytoscape
+	 */
 	private final CyNetworkViewManager networkViewManager;
+	/**
+	 * The manager for networks in Cytoscape
+	 */
 	private final CyNetworkManager networkManager;
+	/**
+	 * The naming service for networks in Cytoscape
+	 */
 	private final CyNetworkNaming cyNetworkNaming;
+	/**
+	 * The manager for data sources in Cytoscape
+	 */
 	private final DataSourceManager dataSourceManager;
+	/**
+	 * The current network in Cytoscape
+	 */
 	private final CyNetwork currentNetwork;
+	/**
+	 * CSV-map created from the CSV-file if it was added
+	 */
 	private final HashMap<String, Double> csvMap;
+	/**
+	 * The boolean defined by the 'crossfeeding' toggle-button
+	 */
 	private boolean showOnlyCrossfeeding;
 
+	/**
+	 * A task-class which executes all the needed steps to create a new network-view.
+	 * @param cyNetworkNaming the naming service for networks in Cytoscape
+	 * @param cnf the factory for creating networks
+	 * @param networkManager the manager for networks in Cytoscape
+	 * @param cnvf the factory for creating network views
+	 * @param networkViewManager the manager for network views in Cytoscape
+	 * @param dataSourceManager the manager for data sources in Cytoscape
+	 * @param currentNetwork the current network in Cytoscape
+	 * @param csvMap the loaded CSV-file for the Fluxes
+	 * @param showOnlyCrossfeeding the boolean of the toggle-button (Show 'crossfeeding')
+	 */
 	public CreateNetworkViewTask(CyNetworkNaming cyNetworkNaming, CyNetworkFactory cnf, CyNetworkManager networkManager,
 								 CyNetworkViewFactory cnvf, final CyNetworkViewManager networkViewManager,
 								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Double> csvMap, boolean showOnlyCrossfeeding) {
