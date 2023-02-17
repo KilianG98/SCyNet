@@ -14,7 +14,7 @@ import java.util.Objects;
 public class FileChoosing {
 
     /**
-     * The chosen file (should be csv-format)
+     * The chosen file (should be CSV-format)
      */
     private File chosenFile;
 
@@ -37,6 +37,7 @@ public class FileChoosing {
 
     /**
      * Using the previously added CSV-file a HashMap is created, which maps all the reactions/edges to a certain Flux.
+     *
      * @return The Hashmap mapping all edges to a Flux. If no file was added an empty HashMap is returned.
      */
     public HashMap<String, Double> makeMap() {

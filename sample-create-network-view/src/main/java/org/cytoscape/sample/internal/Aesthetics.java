@@ -14,10 +14,10 @@ import java.util.List;
 
 import static java.lang.Math.abs;
 /**
-* The Aesthetics class defines methods to modify the visual appearance of a Cytoscape network based on certain criteria.
-* This class takes a CreateNodes object, which is used to access information about the network's nodes, and a HashMap
+* Defines methods to modify the visual appearance of a Cytoscape network based on certain criteria.
+* Takes the CreateNodes object created earlier, which is used to access information about the network's nodes, and a HashMap
 * of flux values for each node. It also takes the network and network view to be modified, a boolean flag indicating whether
-* only crossfeeding nodes should be displayed, and a HashMap of CSV values for each node.
+* only "crossfeeding" nodes should be displayed, and a HashMap of flux values for each node.
 */
 public class Aesthetics {
 
@@ -192,6 +192,7 @@ public class Aesthetics {
 
     /**
      * Calculates equidistant colors for the given number of compartment nodes in the network.
+     * 
      * @param n amount of colors which a needed to generate
      * @return the values for the 'n' colors
      */

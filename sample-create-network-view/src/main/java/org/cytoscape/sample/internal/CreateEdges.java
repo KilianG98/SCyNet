@@ -7,8 +7,8 @@ import org.cytoscape.model.CyNode;
 import java.util.*;
 
 /**
- * This class is used to fill the new network, consisting of only nodes (extracted from the old network), with edges. The edges
- * are added to the corresponding nodes and then their attributes are filled into the EdgeTable.
+ * This class is used to add edges to the newly created network.
+ * The edges are added to the corresponding nodes and then their attributes are filled into the EdgeTable.
  */
 public class CreateEdges {
 
@@ -29,15 +29,15 @@ public class CreateEdges {
      */
     private final CreateNodes createNodes;
     /**
-     * Map of each CyNode from the old network to its outgoing edges
+     * Map of each node from the old network to its outgoing edges
      */
     private final HashMap<CyNode, List<CyEdge>> outgoingEdges;
     /**
-     * Map of each CyNode from the old network to its incoming edges
+     * Map of each node from the old network to its incoming edges
      */
     private final HashMap<CyNode, List<CyEdge>> incomingEdges;
     /**
-     * List of ID's created for each to avoid dubblicates
+     * List of ID's created for each to avoid duplicates
      */
     private final List<String> edgeIDs;
     /**
@@ -45,20 +45,20 @@ public class CreateEdges {
      */
     private final List<CyNode> oldExternalNodes;
     /**
-     * CSV-map created from the CSV-file if it was added
+     * CSV-map created from the CSV-file with fluxes, if it was added
      */
     private final HashMap<String, Double> csvMap;
     /**
-     * boolean saying if the map was added
+     * boolean saying if the CSV-map was added
      */
     private boolean mapAdded = true;
     /**
-     * Flux-Map translated from the CSV-Map
+     * Flux-map translated from the CSV-map
      */
     private final HashMap<CyNode, Double> nodeFluxes = new HashMap<>();
 
     /**
-     * Adds all the corresponding edges and their attributes to a network consisting of only nodes from an oldNetwork.
+     * Adds all the corresponding edges and their attributes to the new network.
      * @param oldNetwork is the original network from which the simple network is created
      * @param newNetwork is the new network, which at this point consists only of nodes
      * @param createNodes is the CreateNodes object created earlier holding all the translations
@@ -81,7 +81,7 @@ public class CreateEdges {
 
 
     /**
-     * With the method the columns of the new EdgeTable are created, then all edges are created and their attributes
+     * The columns of the new EdgeTable are created, then all edges are created and their attributes
      * are added into the table.
      */
     private void makeAllEdges() {
@@ -96,9 +96,9 @@ public class CreateEdges {
     }
 
     /**
-     This method makes edges between external nodes and their sources, or between external nodes and the internal compartment nodes
-     if the sources are located inside a compartment. It loops through all external nodes and their sources, using their corresponding
-     old and new nodes to create edges, and sets the edge attributes.
+     * This method makes edges between external nodes and the sources of edges going to these nodes, or between external nodes and the internal compartment nodes
+     * if the sources are located inside a compartment. It loops through all external nodes and their sources, using their corresponding
+     * old and new nodes to create edges, and sets the edge attributes.
      */
     private void makeEdgesToNode() {
         // here we loop through all external Nodes and get their Sources, using these we make edges the external Nodes
@@ -227,10 +227,11 @@ public class CreateEdges {
     }
 
     /**
-     Adds attributes of an edge to its entry in the edge-table (external Node to external Node).
-     @param currentEdge the current edge to add attributes to
-     @param oldSource the old source node of the current edge
-     @param oldTarget the old target node of the current edge
+     * Adds attributes of an edge to its entry in the edge-table (external Node to external Node).
+     *
+     * @param currentEdge the current edge to add attributes to
+     * @param oldSource the old source node of the current edge
+     * @param oldTarget the old target node of the current edge
      */
     private void edgeTributes (CyEdge currentEdge, CyNode oldSource, CyNode oldTarget){
         // here all the attributes of an Edge are added to its entry in the edge-table (external Node to external Node)
@@ -251,11 +252,12 @@ public class CreateEdges {
     }
 
     /**
-     Adds attributes of an edge to its entry in the edge-table (external Node to comp Node).
-     @param currentEdge The edge whose attributes are to be added.
-     @param oldSource The old source node of the edge.
-     @param oldTarget The old target node of the edge.
-     @param sourceIsComp A boolean indicating if the old source node is a compartment.
+     * Adds attributes of an edge to its entry in the edge-table (external Node to comp Node).
+     *
+     * @param currentEdge The edge whose attributes are to be added.
+     * @param oldSource The old source node of the edge.
+     * @param oldTarget The old target node of the edge.
+     * @param sourceIsComp A boolean indicating if the old source node is a compartment.
      */
     private void edgeTributesComp (CyEdge currentEdge, CyNode oldSource, CyNode oldTarget,boolean sourceIsComp){
         // here all the attributes of an Edge are added to its entry in the edge-table (external Node to comp Node)
@@ -303,7 +305,7 @@ public class CreateEdges {
     }
 
     /**
-     Creates a hashmap to determine whether the nodes in the new network have flux or not, with a default value of 0.0.
+     * Creates a hashmap to determine whether the nodes in the new network have flux or not, with a default value of 0.0.
      */
     private void makeFluxMap(){
         // create a hashmap to determine whether the nodes in the new network  have flux or not, set to 0 as default
@@ -314,10 +316,11 @@ public class CreateEdges {
     }
 
     /**
-     Sets the flux value for a given node in the nodeFluxes hashmap. If the flux value is not 0.0,
-     adds the absolute value of the flux to the current flux value for the node in the hashmap.
-     @param oldNode the old node for which to set the flux value
-     @param fluxValue the new flux value to set for the node
+     * Sets the flux value for a given node in the nodeFluxes hashmap. If the flux value is not 0.0,
+     * adds the absolute value of the flux to the current flux value for the node in the hashmap.
+     *
+     * @param oldNode the old node for which to set the flux value
+     * @param fluxValue the new flux value to set for the node
      */
     private void setFlux(CyNode oldNode, Double fluxValue){
         CyNode newNode = createNodes.getNewNode(oldNode);
@@ -328,10 +331,11 @@ public class CreateEdges {
     }
 
     /**
-     Returns the key for the flux value of a given node, obtained from its sbml id.
-     If the node does not represent a reaction, an empty string is returned.
-     @param oldNode the node for which to obtain the flux key
-     @return the key for the flux value of the node, or an empty string if the node does not represent a reaction
+     * Returns the key for the flux value of a given node, obtained from its sbml id.
+     * If the node does not represent a reaction, an empty string is returned.
+     *
+     * @param oldNode the node for which to obtain the flux key
+     * @return the key for the flux value of the node, or an empty string if the node does not represent a reaction
      */
     private String getFluxKey(CyNode oldNode){
         //why do we use sbml type AND ID?
@@ -351,12 +355,13 @@ public class CreateEdges {
     }
 
     /**
-     Returns the flux value corresponding to the given key from the flux map if it exists. If the key
-     is not found in the flux map and the map has been added, it returns 0.0. If the key is empty or the map
-     has not been added, returns null.
-     @param key the key to retrieve the flux value
-     @return the flux value corresponding to the given key if it exists, 0.0 if the key is not found and the map is added,
-     or null if the key is empty or the map has not been added.
+     * Returns the flux value corresponding to the given key from the flux map if it exists. If the key
+     * is not found in the flux map and the map has been added, it returns 0.0. If the key is empty or the map
+     * has not been added, returns null.
+     *
+     * @param key the key to retrieve the flux value
+     * @return the flux value corresponding to the given key if it exists, 0.0 if the key is not found and the map is added,
+     * or null if the key is empty or the map has not been added.
      */
     private Double getFlux(String key) {
         if (mapAdded && csvMap.get(key) == null) {
@@ -371,6 +376,7 @@ public class CreateEdges {
 
     /**
      * Get-function for the Flux-Map created
+     *
      * @return the Flux-Map
      */
     public HashMap<CyNode, Double> getFLuxMap(){

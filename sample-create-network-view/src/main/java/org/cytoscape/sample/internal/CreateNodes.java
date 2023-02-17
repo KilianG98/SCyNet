@@ -6,17 +6,17 @@ import org.cytoscape.model.CyNode;
 import java.util.*;
 
 /**
- * This class is used to fill the new simpler network with nodes from the old network. The nodes from the exchange-compartment
- * and the nodes for each of the compartments including the exchange compartment are added.
+ * This class is used to fill the new simpler network with nodes from the old network. The nodes from within
+ * the exchange-compartment, the nodes for each of the internal compartments and the exchange compartment node are added.
  */
 public class CreateNodes {
 
     /**
-     * the old original network
+     * The old original network
      */
     final private CyNetwork oldNetwork;
     /**
-     * the newly created simpler network
+     * The newly created simpler network
      */
     private final CyNetwork newNetwork;
     /**
@@ -60,7 +60,7 @@ public class CreateNodes {
 
     /**
      * Fills the newNetwork with the exchange-Nodes from the oldNetwork, as well as the corresponding compartment-Nodes
-     * @param oldNetwork is the network we want to 'simplify'
+     * @param oldNetwork is the network to be simplified
      * @param newNetwork is the newly created empty network, which will be filled with nodes
      */
     public CreateNodes(CyNetwork oldNetwork, CyNetwork newNetwork) {
@@ -153,7 +153,7 @@ public class CreateNodes {
     }
 
     /**
-     * Creates a list of nodes in the 'exchg' compartment from a given network.
+     * Creates a list of nodes in the exchange compartment from the given network.
      */
     private void createExchgNodes() {
         // here a list of nodes in the exchg-compartment is made
@@ -169,7 +169,7 @@ public class CreateNodes {
     }
 
     /**
-     * Adds external nodes to the new network and creates hash maps mapping old to new nodes.
+     * Adds external nodes to the new network and creates hash-maps mapping old to new nodes.
      * @param exchgNodes a list of external nodes to add to the new network
      */
     private void addExtNodesToNewNetwork(List<CyNode> exchgNodes) {
@@ -219,7 +219,7 @@ public class CreateNodes {
 
     /**
      * Get-fucntion
-     * @param node any node from the old network
+     * @param node Metabolite node from the old network
      * @return its compartment only if it is a metabolite, else returns 'unknown'
      */
     private String getCompOfMetaboliteNode(CyNode node) {
@@ -319,8 +319,8 @@ public class CreateNodes {
 
     /**
      * Get-function translation
-     * @param oldNode the CyNode in the old network
-     * @return the CyNode in the new network
+     * @param oldNode any node in the old network
+     * @return the corresponding node in the new network
      */
     public CyNode getNewNode(CyNode oldNode) {
         return oldToNewNodes.get(oldNode);
@@ -328,8 +328,8 @@ public class CreateNodes {
 
     /**
      * Get-function translation
-     * @param newNode the CyNode in the new network
-     * @return the CyNode in the old network
+     * @param newNode a node in the new network
+     * @return the corresponding node in the old network
      */
     public List<CyNode> getOldNode(CyNode newNode) {
         return newToOldNodes.get(newNode);
@@ -372,7 +372,7 @@ public class CreateNodes {
     /**
      * Get-function translation
      * @param compNode the compartments node in the new network
-     * @return its nama as a String
+     * @return its name as a String
      */
     public String getCompNameFromNode(CyNode compNode) {
         return compNodeToCompName.get(compNode);
@@ -380,7 +380,7 @@ public class CreateNodes {
 
     /**
      * Get-function
-     * @param oldNode is node from the old network
+     * @param oldNode any node from the old network
      * @return the shared name listed in the NodeTable
      */
     public String getNodeSharedName(CyNode oldNode) {
