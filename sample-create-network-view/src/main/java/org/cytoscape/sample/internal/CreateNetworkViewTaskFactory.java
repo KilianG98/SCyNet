@@ -4,22 +4,19 @@ import org.cytoscape.io.datasource.DataSourceManager;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
-import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.session.CyNetworkNaming;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
-import org.cytoscape.work.swing.PanelTaskManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
- A task factory to create a task that creates a new network view in Cytoscape based on the current network and a specified data source.
+ * A task factory to create a task that creates a new network view in Cytoscape based on the current network and a specified data source.
  */
 public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 
@@ -96,8 +93,9 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 	}
 
 	/**
-	 Creates a new task iterator for creating a new network view based on the current network and specified data source.
-	 @return a task iterator for the CreateNetworkViewTask
+	 * Creates a new task iterator for creating a new network view based on the current network and specified data source.
+	 *
+	 * @return a task iterator for the CreateNetworkViewTask
 	 */
 	public TaskIterator createTaskIterator() {
 		FileChoosing newChooser = new FileChoosing();
@@ -106,8 +104,9 @@ public class CreateNetworkViewTaskFactory extends AbstractTaskFactory {
 	}
 
 	/**
-	 Returns the toggle button used to display the network view in the app.
-	 @return the toggle button
+	 * Returns the toggle button used to display the network view in the app.
+	 *
+	 * @return the toggle button
 	 */
 	public JToggleButton getButton() {
 		return this.myButton;

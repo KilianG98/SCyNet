@@ -192,7 +192,7 @@ public class Aesthetics {
 
     /**
      * Calculates equidistant colors for the given number of compartment nodes in the network.
-     * 
+     *
      * @param n amount of colors which a needed to generate
      * @return the values for the 'n' colors
      */
