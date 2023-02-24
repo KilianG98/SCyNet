@@ -18,6 +18,8 @@ import org.cytoscape.work.swing.PanelTaskManager;
 import org.osgi.framework.BundleContext;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.session.CyNetworkNaming;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.SynchronousBundleListener;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -77,5 +79,14 @@ public class CyActivator extends AbstractCyActivator {
 		myFrame.add(myButton);
 		myFrame.setSize(400,200);
 		myFrame.setVisible(true);
+
+		bc.addBundleListener(new SynchronousBundleListener() {
+			public void bundleChanged(BundleEvent event) {
+				if (event.getType() == BundleEvent.STOPPING) {
+					// Hide the JToggleButton by setting the JFrame to invisible
+					myFrame.setVisible(false);
+				}
+			}
+		});
 	}
 }
