@@ -47,9 +47,9 @@ public class CreateNetworkViewTask extends AbstractTask {
 	 */
 	private final CyNetwork currentNetwork;
 	/**
-	 * CSV-map created from the CSV-file if it was added
+	 * TSV-map created from the TSV-file if it was added
 	 */
-	private final HashMap<String, Double> csvMap;
+	private final HashMap<String, Double> tsvMap;
 	/**
 	 * The boolean defined by the 'crossfeeding' toggle-button
 	 */
@@ -64,12 +64,12 @@ public class CreateNetworkViewTask extends AbstractTask {
 	 * @param networkViewManager the manager for network views in Cytoscape
 	 * @param dataSourceManager the manager for data sources in Cytoscape
 	 * @param currentNetwork the current network in Cytoscape
-	 * @param csvMap the loaded CSV-file for the Fluxes
+	 * @param tsvMap the loaded TSV-file for the Fluxes
 	 * @param showOnlyCrossfeeding the boolean of the toggle-button (Show 'crossfeeding')
 	 */
 	public CreateNetworkViewTask(CyNetworkNaming cyNetworkNaming, CyNetworkFactory cnf, CyNetworkManager networkManager,
 								 CyNetworkViewFactory cnvf, final CyNetworkViewManager networkViewManager,
-								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Double> csvMap, boolean showOnlyCrossfeeding) {
+								 final DataSourceManager dataSourceManager, CyNetwork currentNetwork, HashMap<String, Double> tsvMap, boolean showOnlyCrossfeeding) {
 		this.cnf = cnf;
 		this.cnvf = cnvf;
 		this.networkViewManager = networkViewManager;
@@ -77,7 +77,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 		this.cyNetworkNaming = cyNetworkNaming;
 		this.dataSourceManager = dataSourceManager;
 		this.currentNetwork = currentNetwork;
-		this.csvMap = csvMap;
+		this.tsvMap = tsvMap;
 		this.showOnlyCrossfeeding = showOnlyCrossfeeding;
 	}
 
@@ -87,7 +87,7 @@ public class CreateNetworkViewTask extends AbstractTask {
 
 		// My Code goes here
 		CreateNodes createNodes = new CreateNodes(currentNetwork, newNetwork);
-		CreateEdges createEdges = new CreateEdges(currentNetwork, newNetwork, createNodes, csvMap);
+		CreateEdges createEdges = new CreateEdges(currentNetwork, newNetwork, createNodes, tsvMap);
 
 		// Here I add a name to my Network
 		newNetwork.getDefaultNetworkTable().getRow(newNetwork.getSUID()).set("name", cyNetworkNaming.getSuggestedNetworkTitle("Simplified Network-view"));
@@ -106,6 +106,6 @@ public class CreateNetworkViewTask extends AbstractTask {
 			System.out.println("This Network View already existed.");
 		}
 		// Here the color/size/label etc. of the Nodes and Edges is changed
-		Aesthetics aesthetics = new Aesthetics(createNodes, createEdges.getFLuxMap(), newNetwork, myView, showOnlyCrossfeeding, csvMap);
+		Aesthetics aesthetics = new Aesthetics(createNodes, createEdges.getFLuxMap(), newNetwork, myView, showOnlyCrossfeeding, tsvMap);
 	}
 }

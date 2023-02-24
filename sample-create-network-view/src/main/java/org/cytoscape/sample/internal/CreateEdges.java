@@ -45,15 +45,15 @@ public class CreateEdges {
      */
     private final List<CyNode> oldExternalNodes;
     /**
-     * CSV-map created from the CSV-file with fluxes, if it was added
+     * TSV-map created from the TSV-file with fluxes, if it was added
      */
-    private final HashMap<String, Double> csvMap;
+    private final HashMap<String, Double> tsvMap;
     /**
-     * boolean saying if the CSV-map was added
+     * boolean saying if the TSV-map was added
      */
     private boolean mapAdded = true;
     /**
-     * Flux-map translated from the CSV-map
+     * Flux-map translated from the TSV-map
      */
     private final HashMap<CyNode, Double> nodeFluxes = new HashMap<>();
 
@@ -62,12 +62,12 @@ public class CreateEdges {
      * @param oldNetwork is the original network from which the simple network is created
      * @param newNetwork is the new network, which at this point consists only of nodes
      * @param createNodes is the CreateNodes object created earlier holding all the translations
-     * @param csvMap is the map with the flux-values, if one was loaded in
+     * @param tsvMap is the map with the flux-values, if one was loaded in
      */
-    public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Double> csvMap) {
+    public CreateEdges(CyNetwork oldNetwork, CyNetwork newNetwork, CreateNodes createNodes, HashMap<String, Double> tsvMap) {
         this.edgeIDs = new ArrayList<>();
-        if (csvMap.isEmpty()) {this.mapAdded = false;}
-        this.csvMap = csvMap;
+        if (tsvMap.isEmpty()) {this.mapAdded = false;}
+        this.tsvMap = tsvMap;
         this.newNetwork = newNetwork;
         this.oldNetwork = oldNetwork;
         this.createNodes = createNodes;
@@ -364,13 +364,13 @@ public class CreateEdges {
      * or null if the key is empty or the map has not been added.
      */
     private Double getFlux(String key) {
-        if (mapAdded && csvMap.get(key) == null) {
+        if (mapAdded && tsvMap.get(key) == null) {
             return 0.0d;
         }
         if (!mapAdded || Objects.equals(key, "")) {
             return null;
         } else {
-            return csvMap.get(key);
+            return tsvMap.get(key);
         }
     }
 

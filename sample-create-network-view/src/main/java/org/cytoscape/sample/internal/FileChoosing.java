@@ -14,21 +14,21 @@ import java.util.Objects;
 public class FileChoosing {
 
     /**
-     * The chosen file (should be CSV-format)
+     * The chosen file (should be TSV-format)
      */
     private File chosenFile;
 
     /**
-     * This opens a JFileChooser where a CSV-file can be selected.
+     * This opens a JFileChooser where a TSV-file can be selected.
      */
     public FileChoosing()
     {
-        // Here we use the JFileChooser to open a window where the user can select a CSV-file with the fluxes
+        // Here we use the JFileChooser to open a window where the user can select a TSV-file with the fluxes
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Choose the tab-delimited CSV-file or press CANCEL");
+        chooser.setDialogTitle("Choose the tab-delimited TSV-file or press CANCEL");
 
         int fileValue = chooser.showDialog(null, "Choose");
-        // If there was no file selected here, later we will return the empty csvMap with makeMap()
+        // If there was no file selected here, later we will return the empty tsvMap with makeMap()
         if(fileValue == JFileChooser.APPROVE_OPTION)
         {
             this.chosenFile = chooser.getSelectedFile();
@@ -36,18 +36,18 @@ public class FileChoosing {
     }
 
     /**
-     * Using the previously added CSV-file a HashMap is created, which maps all the reactions/edges to a certain Flux.
+     * Using the previously added TSV-file a HashMap is created, which maps all the reactions/edges to a certain Flux.
      *
      * @return The Hashmap mapping all edges to a Flux. If no file was added an empty HashMap is returned.
      */
     public HashMap<String, Double> makeMap() {
-        HashMap<String, Double> csvMap = new HashMap<>();
+        HashMap<String, Double> tsvMap = new HashMap<>();
         if (chosenFile == null) {
-            return csvMap;
+            return tsvMap;
         }
         String line = "";
         try {
-            // parsing a CSV file into BufferedReader class constructor
+            // parsing a TSV file into BufferedReader class constructor
             BufferedReader br = new BufferedReader(new FileReader(chosenFile));
             while ((line = br.readLine()) != null)
             {
@@ -60,13 +60,13 @@ public class FileChoosing {
                     } else {
                         key = splitValues[0].concat(splitValues[1]);
                     }
-                    csvMap.put(key, Double.parseDouble(values[1]));
+                    tsvMap.put(key, Double.parseDouble(values[1]));
                 }
             }
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-        return csvMap;
+        return tsvMap;
     }
 }

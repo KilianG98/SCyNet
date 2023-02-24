@@ -38,13 +38,13 @@ public class Aesthetics {
      */
     private final List<String> compList;
     /**
-     * Flux-Map translated from the CSV-Map
+     * Flux-Map translated from the TSV-Map
      */
     private HashMap<CyNode, Double> fluxMap;
     /**
-     * CSV-map created from the CSV-file if it was added
+     * TSV-map created from the TSV-file if it was added
      */
-    private HashMap<String, Double> csvMap;
+    private HashMap<String, Double> tsvMap;
     /**
      * Constructs an Aesthetics object using the specified parameters.
      *
@@ -53,16 +53,16 @@ public class Aesthetics {
      * @param newNetwork        the CyNetwork object to be modified
      * @param newView           the CyNetworkView object to be modified
      * @param showOnlyCrossfeeding  a boolean flag indicating whether only crossfeeding nodes should be displayed
-     * @param csvMap            a HashMap of CSV values for each node in the network
+     * @param tsvMap            a HashMap of TSV values for each node in the network
      */
 
-    public Aesthetics(CreateNodes nodes, HashMap<CyNode, Double> fluxMap, CyNetwork newNetwork, CyNetworkView newView, boolean showOnlyCrossfeeding, HashMap<String, Double> csvMap) {
+    public Aesthetics(CreateNodes nodes, HashMap<CyNode, Double> fluxMap, CyNetwork newNetwork, CyNetworkView newView, boolean showOnlyCrossfeeding, HashMap<String, Double> tsvMap) {
         this.nodes = nodes;
         this.newNetwork = newNetwork;
         this.newView = newView;
         this.compList = nodes.getIntComps();
         this.fluxMap = fluxMap;
-        this.csvMap = csvMap;
+        this.tsvMap = tsvMap;
         compNodes();
         exchgNodes();
         edges();
@@ -110,7 +110,7 @@ public class Aesthetics {
             }
             String exchgNodeName = newNetwork.getDefaultNodeTable().getRow(nodes.getNewNode(exchgNode).getSUID()).get("shared name", String.class);
             exchgNodeView.setLockedValue(BasicVisualLexicon.NODE_LABEL, exchgNodeName);
-            if (!csvMap.isEmpty() && fluxMap.get(newNode).equals(0.0d)){
+            if (!tsvMap.isEmpty() && fluxMap.get(newNode).equals(0.0d)){
                 newNetwork.removeNodes(Collections.singletonList(newNode));
                 // exchgNodeView.setVisualProperty(BasicVisualLexicon.NODE_TRANSPARENCY, 0);
             }

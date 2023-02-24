@@ -28,7 +28,7 @@ import java.util.Set;
 
 
 /**
- The CyActivator class is responsible for activating the CyNDEx-2 application in Cytoscape.
+ The CyActivator class is responsible for activating the SCyNet application in Cytoscape.
  This class extends the AbstractCyActivator class and overrides the start() method to register the necessary
  services, tasks, and factories for the application to work properly.
  */
@@ -57,7 +57,7 @@ public class CyActivator extends AbstractCyActivator {
 
 		// Set properties for creating a network view task factory
 		Properties createNetworkViewTaskFactoryProps = new Properties();
-		createNetworkViewTaskFactoryProps.setProperty("preferredMenu","Apps.Samples");
+		createNetworkViewTaskFactoryProps.setProperty("preferredMenu","Apps.SCyNet");
 
 		// Create a JFrame and JToggleButton for the new menu item
 		JFrame myFrame = new JFrame();
