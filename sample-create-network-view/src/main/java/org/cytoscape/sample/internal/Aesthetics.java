@@ -101,8 +101,8 @@ public class Aesthetics {
      */
     private void exchgNodes() {
         // Here we change the appearance of the external Nodes
-        List<CyNode> extNodesList = nodes.getExchgNodes();
-        for (CyNode exchgNode : extNodesList) {
+        List<CyNode> exchgNodes = nodes.getExchgNodes();
+        for (CyNode exchgNode : exchgNodes) {
             CyNode newNode = nodes.getNewNode(exchgNode);
             View<CyNode> exchgNodeView = newView.getNodeView(newNode);
             if (exchgNodeView == null) {
@@ -162,8 +162,8 @@ public class Aesthetics {
      */
     private void removeNonCFNodes() {
 
-        List<CyNode> extNodesList = nodes.getExchgNodes();
-        for (CyNode exchgNode : extNodesList) {
+        List<CyNode> exchgNodes = nodes.getExchgNodes();
+        for (CyNode exchgNode : exchgNodes) {
             CyNode newNode = nodes.getNewNode(exchgNode);
             List<CyEdge> adjacentEdgeList = newNetwork.getAdjacentEdgeList(newNode, CyEdge.Type.ANY);
             boolean positive = false;

@@ -268,7 +268,7 @@ public class CreateEdges {
             String fluxKey = getFluxKey(oldSource);
             Double fluxValue = getFlux(fluxKey);
             if(mapAdded) {
-                setFlux(oldTarget, fluxValue);
+                setNewFlux(oldTarget, fluxValue);
             }
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
@@ -283,7 +283,7 @@ public class CreateEdges {
             String fluxKey = getFluxKey(oldTarget);
             Double fluxValue = getFlux(fluxKey);
             if(mapAdded) {
-                setFlux(oldSource, fluxValue);
+                setNewFlux(oldSource, fluxValue);
             }
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("source", sourceName);
             newNetwork.getDefaultEdgeTable().getRow(currentEdge.getSUID()).set("target", targetName);
@@ -308,7 +308,7 @@ public class CreateEdges {
      * Creates a hashmap to determine whether the nodes in the new network have flux or not, with a default value of 0.0.
      */
     private void makeFluxMap(){
-        // create a hashmap to determine whether the nodes in the new network  have flux or not, set to 0 as default
+
         for (CyNode exchgNode: createNodes.getExchgNodes()){
             CyNode newExchgNode = createNodes.getNewNode(exchgNode);
             nodeFluxes.putIfAbsent(newExchgNode, 0.0d);
@@ -316,13 +316,12 @@ public class CreateEdges {
     }
 
     /**
-     * Sets the flux value for a given node in the nodeFluxes hashmap. If the flux value is not 0.0,
-     * adds the absolute value of the flux to the current flux value for the node in the hashmap.
+     * Edits the flux of a given node in the nodeFluxes hashmap by adding the current flux value to the old flux value.
      *
      * @param oldNode the old node for which to set the flux value
      * @param fluxValue the new flux value to set for the node
      */
-    private void setFlux(CyNode oldNode, Double fluxValue){
+    private void setNewFlux(CyNode oldNode, Double fluxValue){
         CyNode newNode = createNodes.getNewNode(oldNode);
         if (!fluxValue.equals(0.0)){
             Double newFlux = nodeFluxes.get(newNode) + Math.abs(fluxValue);
